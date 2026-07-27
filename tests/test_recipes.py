@@ -43,6 +43,7 @@ class RecipeRepositoryTests(unittest.TestCase):
                 [metadata["service"]],
                 [service["serviceName"] for service in recipe["services"]],
             )
+            self.assertEqual(metadata["recipeFormatVersion"], 1)
 
             actions = {
                 action["actionType"]
@@ -57,6 +58,13 @@ class RecipeRepositoryTests(unittest.TestCase):
             for path in (ROOT / "recipes").glob("*/bc-recipe__*.yaml")
         ]
         self.assertEqual(len(names), len(set(names)))
+
+    def test_exported_runtime_contract_is_named_for_the_service(self):
+        metadata = yaml.safe_load(
+            (ROOT / "recipes" / "free" / "metadata.yaml").read_text()
+        )
+        expected = f"bc-metadata__{metadata['service']}.yaml"
+        self.assertEqual(expected, "bc-metadata__free.yaml")
 
 
 if __name__ == "__main__":

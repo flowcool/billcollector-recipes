@@ -26,3 +26,4 @@ jobs:
       - run: |
           ./scripts/export-recipes.sh . ./export
           test -f ./export/bc-recipe__free.yaml
+          test -f ./export/bc-metadata__free.yaml

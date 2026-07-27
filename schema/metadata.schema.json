@@ -7,6 +7,7 @@
     "product",
     "service",
     "recipeVersion",
+    "recipeFormatVersion",
     "status",
     "minimumRevision",
     "requiredActions",
@@ -22,6 +23,7 @@
       "type": "string",
       "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
     },
+    "recipeFormatVersion": {"type": "integer", "minimum": 1},
     "status": {
       "type": "string",
       "enum": ["experimental", "beta", "stable", "broken", "retired"]

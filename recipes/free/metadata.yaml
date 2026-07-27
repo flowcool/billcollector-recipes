@@ -3,6 +3,7 @@ provider: "Free"
 product: "Freebox Internet"
 service: "free"
 recipeVersion: "0.1.0"
+recipeFormatVersion: 1
 status: "beta"
 minimumRevision: "06f1d27"
 requiredActions:
