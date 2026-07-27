@@ -57,7 +57,7 @@ services:
     entrypoint: ["/bin/bash", "-euc"]
     command:
       - |
-        cp /config/recipes/bc-recipe__*.yaml /apps/bc-recipes/
+        cp /config/recipes/bc-*.yaml /apps/bc-recipes/
         exec python3 ./BillCollector.py /config/billcollector.ini
 ```
 
@@ -137,26 +137,29 @@ tests/
 ```
 
 `metadata.yaml` documents compatibility and validation. It is not interpreted
-by the current BillCollector engine.
+directly from the provider directory. The export command renames it to
+`bc-metadata__<service>.yaml`; current BillCollector images validate that
+runtime contract before opening the provider portal.
 
 ## Compatibility
 
 Every recipe declares:
 
 - its own version;
+- its recipe format version;
 - its lifecycle status;
 - the minimum BillCollector revision or release;
 - required engine actions;
 - its authentication characteristics;
 - the date and scope of its last validation.
 
-Until BillCollector has stable semantic releases, `minimumRevision` is the
-authoritative compatibility field. For the first Free recipe, use an image
-containing revision `06f1d27` or later.
+`recipeFormatVersion` and `requiredActions` are enforced at runtime by current
+BillCollector images. Until BillCollector has stable semantic releases,
+`minimumRevision` remains the human-readable image baseline. For the first Free
+recipe, use an image containing revision `06f1d27` or later.
 
-An incompatible recipe must fail CI before release. Runtime compatibility
-checking is planned for the engine; until then, check `metadata.yaml` before
-updating.
+An incompatible recipe must fail CI before release and stop explicitly at
+runtime before any provider login is attempted.
 
 ## Contributing a recipe
 

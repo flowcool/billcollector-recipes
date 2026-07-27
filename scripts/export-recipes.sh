@@ -20,6 +20,15 @@ for recipe in "$source_dir"/recipes/*/bc-recipe__*.yaml; do
     continue
   fi
   cp "$recipe" "$destination_dir/"
+  provider_dir=$(dirname "$recipe")
+  service_name=$(basename "$recipe" .yaml)
+  service_name=${service_name#bc-recipe__}
+  metadata="$provider_dir/metadata.yaml"
+  if [ ! -f "$metadata" ]; then
+    echo "Metadata not found for $service_name." >&2
+    exit 1
+  fi
+  cp "$metadata" "$destination_dir/bc-metadata__${service_name}.yaml"
   found=1
 done
 
