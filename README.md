@@ -19,6 +19,7 @@ data.
 |---|---|---|---|---|
 | Freebox Internet | `free` | Beta | Username/password, no MFA observed | 2026-07-27 |
 | Fulli Toll | `fulli` | Beta | Username/password, no MFA observed | 2026-09-27 |
+| Mint Energie | `mint_energie` | Experimental | Username/password, no MFA observed | 2026-09-27 |
 
 The Free recipe downloaded 19 historical invoices during its initial
 end-to-end validation. That result does not guarantee that Free's portal is
@@ -28,6 +29,11 @@ The Fulli recipe completed an isolated end-to-end validation against the real
 account: 14 PDF invoices were published on the first run, and the second run
 published no new files while skipping all 14 known documents. This validation
 does not deploy or schedule the recipe.
+
+The Mint Energie recipe completed authenticated selector validation against
+the real account: login, direct invoice-page navigation, and the PDF download
+link were observed. End-to-end download and deduplication validation remain
+required before promoting it from experimental status.
 
 ## Installation
 
@@ -142,6 +148,23 @@ Fulli [Toll]
 The Fulli login page may present a FriendlyCaptcha challenge. BillCollector
 does not bypass it; authenticated validation must stop if human interaction is
 required.
+
+For Mint Energie, name the Bitwarden item exactly `Mint Energie`. Keep the
+account-specific activation or creation URL only in Bitwarden; do not commit it
+to the recipe repository.
+
+```text
+Name: Mint Energie
+Username: your Mint Energie email address
+Password: your Mint Energie password
+URI: your account-specific Mint Energie URL
+```
+
+Then add this line to `billcollector.ini`:
+
+```ini
+Mint Energie
+```
 
 The suffix is only a local account label. It must not be added to the recipe.
 
