@@ -20,6 +20,7 @@ data.
 | Freebox Internet | `free` | Beta | Username/password, no MFA observed | 2026-07-27 |
 | Fulli Toll | `fulli` | Beta | Username/password, no MFA observed | 2026-09-27 |
 | Mint Energie | `mint_energie` | Beta | Username/password, no MFA observed | 2026-09-27 |
+| Octopus Energy France | `octopus_energy` | Beta | Username/password, no MFA observed | 2026-09-27 |
 
 The Free recipe downloaded 19 historical invoices during its initial
 end-to-end validation. That result does not guarantee that Free's portal is
@@ -33,6 +34,10 @@ does not deploy or schedule the recipe.
 The Mint Energie recipe completed an isolated end-to-end validation against
 the real account: one PDF invoice was published on the first run, and the
 second run skipped the known document and published nothing new.
+
+The Octopus Energy recipe completed an isolated end-to-end validation: the
+first run published one PDF payment schedule, and the second run recognized
+the same document and published nothing new.
 
 ## Installation
 
@@ -164,6 +169,20 @@ Then add this line to `billcollector.ini`:
 ```ini
 Mint Energie
 ```
+
+For Octopus Energy France, name the Bitwarden item exactly `Octopus Energy`
+and set its URI to `https://octopusenergy.fr/espace-client/comptes/`. The
+recipe navigates to **Factures et paiements** without storing private account,
+property, or agreement identifiers. Then add this line to
+`billcollector.ini`:
+
+```ini
+Octopus Energy
+```
+
+The initial recipe downloads the payment schedule currently exposed by the
+account. Invoice collection can be added after an issued invoice is available
+for selector validation.
 
 The suffix is only a local account label. It must not be added to the recipe.
 
