@@ -58,8 +58,8 @@ services:
         actionType: "ClickUntilAbsent"
         parameters:
           locators:
-            - locatorType: "ID"
-              element: "js--transactions-invoices-pager"
+            - locatorType: "XPATH"
+              element: "//button[@id='js--transactions-invoices-pager' and not(contains(concat(' ', normalize-space(@class), ' '), ' visually-hidden '))]"
             - locatorType: "XPATH"
               element: "//ul[@id='js--transactions-list']/li[contains(concat(' ', normalize-space(@class), ' '), ' data-list__item ')]//a[starts-with(@href, '/customer-space/invoice/download/')]"
           timeout: 30

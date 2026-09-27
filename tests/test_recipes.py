@@ -95,7 +95,9 @@ class RecipeRepositoryTests(unittest.TestCase):
                 "//a[@href='/espace-client/factures' and "
                 "contains(concat(' ', normalize-space(@class), ' '), "
                 "' Button ')]",
-                "js--transactions-invoices-pager",
+                "//button[@id='js--transactions-invoices-pager' and "
+                "not(contains(concat(' ', normalize-space(@class), ' '), "
+                "' visually-hidden '))]",
                 "//ul[@id='js--transactions-list']/li[contains(concat(' ', "
                 "normalize-space(@class), ' '), ' data-list__item ')]"
                 "//a[starts-with(@href, "
