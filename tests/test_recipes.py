@@ -79,6 +79,7 @@ class RecipeRepositoryTests(unittest.TestCase):
                 "SendKeys",
                 "Click",
                 "Click",
+                "Click",
                 "ClickUntilAbsent",
                 "DownloadAll",
             ],
@@ -90,6 +91,7 @@ class RecipeRepositoryTests(unittest.TestCase):
                 "otp-submit-btn",
                 "password",
                 "pass-submit-btn",
+                "onetrust-reject-all-handler",
                 "//a[@href='/espace-client/factures' and "
                 "contains(concat(' ', normalize-space(@class), ' '), "
                 "' Button ')]",
@@ -108,11 +110,13 @@ class RecipeRepositoryTests(unittest.TestCase):
         self.assertEqual(
             "{PASSWORD}", actions[2]["parameters"]["variable"]
         )
+        self.assertTrue(actions[4]["parameters"]["graceful"])
+        self.assertEqual(5, actions[4]["parameters"]["timeout"])
         self.assertEqual(
-            actions[5]["parameters"]["locators"][1]["element"],
-            actions[6]["parameters"]["locators"][0]["element"],
+            actions[6]["parameters"]["locators"][1]["element"],
+            actions[7]["parameters"]["locators"][0]["element"],
         )
-        self.assertEqual(20, actions[5]["parameters"]["maxClicks"])
+        self.assertEqual(20, actions[6]["parameters"]["maxClicks"])
 
 
 if __name__ == "__main__":
