@@ -1,0 +1,43 @@
+---
+services:
+  - serviceName: "mint_energie"
+    actions:
+      - step: 1
+        description: "Enter the Mint Energie email address."
+        actionType: "SendKeys"
+        parameters:
+          locators:
+            - locatorType: "ID"
+              element: "TB_Login"
+          variable: "{USERNAME}"
+          timeout: 30
+      - step: 2
+        description: "Enter the Mint Energie password."
+        actionType: "SendKeys"
+        parameters:
+          locators:
+            - locatorType: "ID"
+              element: "TB_Password"
+          variable: "{PASSWORD}"
+          timeout: 30
+      - step: 3
+        description: "Submit the Mint Energie login form."
+        actionType: "Click"
+        parameters:
+          locators:
+            - locatorType: "ID"
+              element: "BT_Connexion"
+          timeout: 30
+      - step: 4
+        description: "Open the Mint Energie invoice list."
+        actionType: "Navigate"
+        parameters:
+          url: "https://client.mint-energie.com/Pages/Compte/factures_liste.aspx"
+      - step: 5
+        description: "Download every PDF invoice from the Mint Energie invoice list."
+        actionType: "DownloadAll"
+        parameters:
+          locators:
+            - locatorType: "XPATH"
+              element: "//a[normalize-space()='Afficher le PDF' and contains(@href, '.pdf')]"
+          timeout: 60

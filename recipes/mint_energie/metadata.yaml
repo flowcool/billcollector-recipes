@@ -1,0 +1,20 @@
+---
+provider: "Mint Energie"
+product: "Electricity"
+service: "mint_energie"
+recipeVersion: "0.1.0"
+recipeFormatVersion: 1
+status: "experimental"
+minimumRevision: "469389a"
+requiredActions:
+  - "SendKeys"
+  - "Click"
+  - "Navigate"
+  - "DownloadAll"
+authentication:
+  usernamePassword: true
+  mfa: false
+startUrl: "https://client.mint-energie.com/Pages/Connexion/connexion.aspx"
+validation:
+  lastTested: "2026-09-27"
+  scope: "Authenticated validation of login, direct invoice-page navigation, and PDF-link selector; end-to-end download pending the published engine image"

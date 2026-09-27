@@ -29,6 +29,7 @@
                 "actionType": {
                   "type": "string",
                   "enum": [
+                    "Navigate",
                     "SwitchToParentFrame",
                     "SwitchToDefaultFrame",
                     "SwitchToFrame",
@@ -64,6 +65,10 @@
                         }
                       }
                     },
+                    "url": {
+                      "type": "string",
+                      "pattern": "^https://"
+                    },
                     "variable": {
                       "type": "string",
                       "enum": [
@@ -84,6 +89,18 @@
                 }
               },
               "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "actionType": {"const": "Navigate"}
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "parameters": {"required": ["url"]}
+                    }
+                  }
+                },
                 {
                   "if": {
                     "properties": {
