@@ -4,7 +4,7 @@ product: "Electricity"
 service: "mint_energie"
 recipeVersion: "0.1.0"
 recipeFormatVersion: 1
-status: "experimental"
+status: "beta"
 minimumRevision: "469389a"
 requiredActions:
   - "SendKeys"
@@ -17,4 +17,4 @@ authentication:
 startUrl: "https://client.mint-energie.com/Pages/Connexion/connexion.aspx"
 validation:
   lastTested: "2026-09-27"
-  scope: "Authenticated validation of login, direct invoice-page navigation, and PDF-link selector; end-to-end download pending the published engine image"
+  scope: "Isolated end-to-end validation: login, direct invoice-page navigation, one PDF download, and zero-new-file deduplication rerun"
