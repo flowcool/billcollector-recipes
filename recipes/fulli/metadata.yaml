@@ -5,7 +5,7 @@ service: "fulli"
 recipeVersion: "0.1.0"
 recipeFormatVersion: 1
 status: "experimental"
-minimumRevision: "712e029"
+minimumRevision: "a36f638"
 requiredActions:
   - "SendKeys"
   - "Click"
