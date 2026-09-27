@@ -2,9 +2,9 @@
 provider: "Fulli"
 product: "Fulli Toll"
 service: "fulli"
-recipeVersion: "0.1.0"
+recipeVersion: "0.2.0"
 recipeFormatVersion: 1
-status: "experimental"
+status: "beta"
 minimumRevision: "a36f638"
 requiredActions:
   - "SendKeys"
@@ -17,4 +17,4 @@ authentication:
 startUrl: "https://www.fulli.com/customer/login"
 validation:
   lastTested: "2026-09-27"
-  scope: "Authenticated login and invoice-history DOM validated; pagination and downloads not yet executed"
+  scope: "Isolated end-to-end validation: login, consent handling, pagination, 14 PDF downloads, and zero-new-file deduplication rerun"

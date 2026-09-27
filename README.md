@@ -18,15 +18,16 @@ data.
 | Provider | Service | Status | Authentication | Last real validation |
 |---|---|---|---|---|
 | Freebox Internet | `free` | Beta | Username/password, no MFA observed | 2026-07-27 |
-| Fulli Toll | `fulli` | Experimental | Username/password, no MFA reported | Not yet validated |
+| Fulli Toll | `fulli` | Beta | Username/password, no MFA observed | 2026-09-27 |
 
 The Free recipe downloaded 19 historical invoices during its initial
 end-to-end validation. That result does not guarantee that Free's portal is
 unchanged today.
 
-The Fulli recipe covers the authenticated two-step login and the observed
-invoice-history structure. Its bounded pagination and downloads are not yet
-validated against the real account, so it must not be scheduled.
+The Fulli recipe completed an isolated end-to-end validation against the real
+account: 14 PDF invoices were published on the first run, and the second run
+published no new files while skipping all 14 known documents. This validation
+does not deploy or schedule the recipe.
 
 ## Installation
 
@@ -132,7 +133,7 @@ Password: your Fulli password
 URI: https://www.fulli.com/customer/login
 ```
 
-Then select the experimental recipe with:
+Then select the beta recipe with:
 
 ```ini
 Fulli [Toll]
