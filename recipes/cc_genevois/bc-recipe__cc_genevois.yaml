@@ -1,0 +1,63 @@
+---
+services:
+  - serviceName: "cc_genevois"
+    actions:
+      - step: 1
+        description: "Dismiss the optional cookie notice."
+        actionType: "Click"
+        parameters:
+          locators:
+            - locatorType: "CSS_SELECTOR"
+              element: ".cb__container__button button"
+          timeout: 5
+          graceful: true
+      - step: 2
+        description: "Open the CC Genevois login page."
+        actionType: "Click"
+        parameters:
+          locators:
+            - locatorType: "XPATH"
+              element: "//a[@href='/public/connexion']"
+          timeout: 30
+      - step: 3
+        description: "Enter the CC Genevois email address."
+        actionType: "SendKeys"
+        parameters:
+          locators:
+            - locatorType: "ID"
+              element: "_email"
+          variable: "{USERNAME}"
+          timeout: 30
+      - step: 4
+        description: "Enter the CC Genevois password."
+        actionType: "SendKeys"
+        parameters:
+          locators:
+            - locatorType: "ID"
+              element: "_password"
+          variable: "{PASSWORD}"
+          timeout: 30
+      - step: 5
+        description: "Submit the CC Genevois login form."
+        actionType: "Click"
+        parameters:
+          locators:
+            - locatorType: "CSS_SELECTOR"
+              element: "button[type='submit']"
+          timeout: 30
+      - step: 6
+        description: "Open the CC Genevois invoice list."
+        actionType: "Click"
+        parameters:
+          locators:
+            - locatorType: "XPATH"
+              element: "//a[@href='/factures']"
+          timeout: 30
+      - step: 7
+        description: "Download every CC Genevois invoice."
+        actionType: "DownloadAll"
+        parameters:
+          locators:
+            - locatorType: "XPATH"
+              element: "//div[contains(concat(' ', normalize-space(@class), ' '), ' svg-link__block ') and @title='Télécharger']"
+          timeout: 60

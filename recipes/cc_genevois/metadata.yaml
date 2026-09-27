@@ -1,0 +1,19 @@
+---
+provider: "Communauté de communes du Genevois"
+product: "Water"
+service: "cc_genevois"
+recipeVersion: "0.1.0"
+recipeFormatVersion: 1
+status: "beta"
+minimumRevision: "9e1d251"
+requiredActions:
+  - "Click"
+  - "SendKeys"
+  - "DownloadAll"
+authentication:
+  usernamePassword: true
+  mfa: false
+startUrl: "https://abonnes.cc-genevois.fr"
+validation:
+  lastTested: "2026-09-27"
+  scope: "Isolated end-to-end validation: login, five PDF invoice downloads, and zero-new-file deduplication rerun"
