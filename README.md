@@ -19,7 +19,7 @@ data.
 |---|---|---|---|---|
 | Freebox Internet | `free` | Beta | Username/password, no MFA observed | 2026-07-27 |
 | Fulli Toll | `fulli` | Beta | Username/password, no MFA observed | 2026-09-27 |
-| Mint Energie | `mint_energie` | Experimental | Username/password, no MFA observed | 2026-09-27 |
+| Mint Energie | `mint_energie` | Beta | Username/password, no MFA observed | 2026-09-27 |
 
 The Free recipe downloaded 19 historical invoices during its initial
 end-to-end validation. That result does not guarantee that Free's portal is
@@ -30,10 +30,9 @@ account: 14 PDF invoices were published on the first run, and the second run
 published no new files while skipping all 14 known documents. This validation
 does not deploy or schedule the recipe.
 
-The Mint Energie recipe completed authenticated selector validation against
-the real account: login, direct invoice-page navigation, and the PDF download
-link were observed. End-to-end download and deduplication validation remain
-required before promoting it from experimental status.
+The Mint Energie recipe completed an isolated end-to-end validation against
+the real account: one PDF invoice was published on the first run, and the
+second run skipped the known document and published nothing new.
 
 ## Installation
 
