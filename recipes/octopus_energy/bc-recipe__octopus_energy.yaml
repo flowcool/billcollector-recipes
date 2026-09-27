@@ -1,0 +1,54 @@
+---
+services:
+  - serviceName: "octopus_energy"
+    actions:
+      - step: 1
+        description: "Enter the Octopus Energy email address."
+        actionType: "SendKeys"
+        parameters:
+          locators:
+            - locatorType: "CSS_SELECTOR"
+              element: "[data-testid='login-email-field']"
+          variable: "{USERNAME}"
+          timeout: 30
+      - step: 2
+        description: "Enter the Octopus Energy password."
+        actionType: "SendKeys"
+        parameters:
+          locators:
+            - locatorType: "CSS_SELECTOR"
+              element: "[data-testid='password-field']"
+          variable: "{PASSWORD}"
+          timeout: 30
+      - step: 3
+        description: "Submit the Octopus Energy login form."
+        actionType: "Click"
+        parameters:
+          locators:
+            - locatorType: "CSS_SELECTOR"
+              element: "[data-testid='loginButton']"
+          timeout: 30
+      - step: 4
+        description: "Open the Octopus Energy bills and payments page."
+        actionType: "Click"
+        parameters:
+          locators:
+            - locatorType: "XPATH"
+              element: "//a[contains(@href, '/factures-et-paiements') and not(@data-part)]"
+          timeout: 30
+      - step: 5
+        description: "Open the Octopus Energy agreement billing page."
+        actionType: "Click"
+        parameters:
+          locators:
+            - locatorType: "XPATH"
+              element: "//a[contains(@href, '/factures-et-paiements/')]"
+          timeout: 30
+      - step: 6
+        description: "Download the Octopus Energy payment schedule."
+        actionType: "Download"
+        parameters:
+          locators:
+            - locatorType: "XPATH"
+              element: "//button[normalize-space()='Mon échéancier de paiement']"
+          timeout: 60

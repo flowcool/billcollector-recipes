@@ -1,0 +1,19 @@
+---
+provider: "Octopus Energy France"
+product: "Electricity and gas"
+service: "octopus_energy"
+recipeVersion: "0.1.0"
+recipeFormatVersion: 1
+status: "beta"
+minimumRevision: "e51a1cc"
+requiredActions:
+  - "SendKeys"
+  - "Click"
+  - "Download"
+authentication:
+  usernamePassword: true
+  mfa: false
+startUrl: "https://octopusenergy.fr/connexion"
+validation:
+  lastTested: "2026-09-27"
+  scope: "Isolated end-to-end validation: login, payment schedule PDF download, and zero-new-file deduplication rerun"
