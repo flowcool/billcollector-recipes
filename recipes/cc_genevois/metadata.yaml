@@ -5,7 +5,7 @@ service: "cc_genevois"
 recipeVersion: "0.1.0"
 recipeFormatVersion: 1
 status: "beta"
-minimumRevision: "f39636c"
+minimumRevision: "9e1d251"
 requiredActions:
   - "Click"
   - "SendKeys"
@@ -16,4 +16,4 @@ authentication:
 startUrl: "https://abonnes.cc-genevois.fr"
 validation:
   lastTested: "2026-09-27"
-  scope: "Pending isolated end-to-end validation"
+  scope: "Isolated end-to-end validation: login, five PDF invoice downloads, and zero-new-file deduplication rerun"

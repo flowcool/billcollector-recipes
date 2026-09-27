@@ -21,7 +21,7 @@ data.
 | Fulli Toll | `fulli` | Beta | Username/password, no MFA observed | 2026-09-27 |
 | Mint Energie | `mint_energie` | Beta | Username/password, no MFA observed | 2026-09-27 |
 | Octopus Energy France | `octopus_energy` | Beta | Username/password, no MFA observed | 2026-09-27 |
-| CC Genevois Water | `cc_genevois` | Beta | Username/password, no MFA observed | Pending |
+| CC Genevois Water | `cc_genevois` | Beta | Username/password, no MFA observed | 2026-09-27 |
 
 The Free recipe downloaded 19 historical invoices during its initial
 end-to-end validation. That result does not guarantee that Free's portal is
@@ -194,6 +194,8 @@ CC Genevois
 ```
 
 The recipe signs in, opens the invoice list, and downloads every available PDF.
+Its isolated validation published five PDF invoices; the second run recognized
+all five documents and published nothing new.
 
 The suffix is only a local account label. It must not be added to the recipe.
 
