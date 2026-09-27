@@ -1,0 +1,20 @@
+---
+provider: "Fulli"
+product: "Fulli Toll"
+service: "fulli"
+recipeVersion: "0.2.0"
+recipeFormatVersion: 1
+status: "beta"
+minimumRevision: "a36f638"
+requiredActions:
+  - "SendKeys"
+  - "Click"
+  - "ClickUntilAbsent"
+  - "DownloadAll"
+authentication:
+  usernamePassword: true
+  mfa: false
+startUrl: "https://www.fulli.com/customer/login"
+validation:
+  lastTested: "2026-09-27"
+  scope: "Isolated end-to-end validation: login, consent handling, pagination, 14 PDF downloads, and zero-new-file deduplication rerun"

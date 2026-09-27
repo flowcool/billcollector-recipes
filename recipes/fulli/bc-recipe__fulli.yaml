@@ -1,0 +1,74 @@
+---
+services:
+  - serviceName: "fulli"
+    actions:
+      - step: 1
+        description: "Enter the Fulli email address or customer number."
+        actionType: "SendKeys"
+        parameters:
+          locators:
+            - locatorType: "ID"
+              element: "identifier"
+          variable: "{USERNAME}"
+          timeout: 30
+      - step: 2
+        description: "Continue to the Fulli password screen."
+        actionType: "Click"
+        parameters:
+          locators:
+            - locatorType: "ID"
+              element: "otp-submit-btn"
+          timeout: 30
+      - step: 3
+        description: "Enter the Fulli password."
+        actionType: "SendKeys"
+        parameters:
+          locators:
+            - locatorType: "ID"
+              element: "password"
+          variable: "{PASSWORD}"
+          timeout: 30
+      - step: 4
+        description: "Submit the Fulli login form."
+        actionType: "Click"
+        parameters:
+          locators:
+            - locatorType: "ID"
+              element: "pass-submit-btn"
+          timeout: 30
+      - step: 5
+        description: "Reject the optional Fulli cookie banner."
+        actionType: "Click"
+        parameters:
+          locators:
+            - locatorType: "ID"
+              element: "onetrust-reject-all-handler"
+          timeout: 5
+          graceful: true
+      - step: 6
+        description: "Open the Fulli invoice history."
+        actionType: "Click"
+        parameters:
+          locators:
+            - locatorType: "XPATH"
+              element: "//a[@href='/espace-client/factures' and contains(concat(' ', normalize-space(@class), ' '), ' Button ')]"
+          timeout: 30
+      - step: 7
+        description: "Load every page of the Fulli invoice history."
+        actionType: "ClickUntilAbsent"
+        parameters:
+          locators:
+            - locatorType: "XPATH"
+              element: "//button[@id='js--transactions-invoices-pager' and not(contains(concat(' ', normalize-space(@class), ' '), ' visually-hidden '))]"
+            - locatorType: "XPATH"
+              element: "//ul[@id='js--transactions-list']/li[contains(concat(' ', normalize-space(@class), ' '), ' data-list__item ')]//a[starts-with(@href, '/customer-space/invoice/download/')]"
+          timeout: 30
+          maxClicks: 20
+      - step: 8
+        description: "Download every PDF invoice from the Fulli history list."
+        actionType: "DownloadAll"
+        parameters:
+          locators:
+            - locatorType: "XPATH"
+              element: "//ul[@id='js--transactions-list']/li[contains(concat(' ', normalize-space(@class), ' '), ' data-list__item ')]//a[starts-with(@href, '/customer-space/invoice/download/')]"
+          timeout: 60

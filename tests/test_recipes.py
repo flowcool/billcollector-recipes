@@ -66,6 +66,60 @@ class RecipeRepositoryTests(unittest.TestCase):
         expected = f"bc-metadata__{metadata['service']}.yaml"
         self.assertEqual(expected, "bc-metadata__free.yaml")
 
+    def test_fulli_recipe_matches_the_validated_flow(self):
+        recipe = yaml.safe_load(
+            (ROOT / "recipes" / "fulli" / "bc-recipe__fulli.yaml")
+            .read_text()
+        )
+        actions = recipe["services"][0]["actions"]
+        self.assertEqual(
+            [
+                "SendKeys",
+                "Click",
+                "SendKeys",
+                "Click",
+                "Click",
+                "Click",
+                "ClickUntilAbsent",
+                "DownloadAll",
+            ],
+            [action["actionType"] for action in actions],
+        )
+        self.assertEqual(
+            [
+                "identifier",
+                "otp-submit-btn",
+                "password",
+                "pass-submit-btn",
+                "onetrust-reject-all-handler",
+                "//a[@href='/espace-client/factures' and "
+                "contains(concat(' ', normalize-space(@class), ' '), "
+                "' Button ')]",
+                "//button[@id='js--transactions-invoices-pager' and "
+                "not(contains(concat(' ', normalize-space(@class), ' '), "
+                "' visually-hidden '))]",
+                "//ul[@id='js--transactions-list']/li[contains(concat(' ', "
+                "normalize-space(@class), ' '), ' data-list__item ')]"
+                "//a[starts-with(@href, "
+                "'/customer-space/invoice/download/')]",
+            ],
+            [action["parameters"]["locators"][0]["element"]
+             for action in actions],
+        )
+        self.assertEqual(
+            "{USERNAME}", actions[0]["parameters"]["variable"]
+        )
+        self.assertEqual(
+            "{PASSWORD}", actions[2]["parameters"]["variable"]
+        )
+        self.assertTrue(actions[4]["parameters"]["graceful"])
+        self.assertEqual(5, actions[4]["parameters"]["timeout"])
+        self.assertEqual(
+            actions[6]["parameters"]["locators"][1]["element"],
+            actions[7]["parameters"]["locators"][0]["element"],
+        )
+        self.assertEqual(20, actions[6]["parameters"]["maxClicks"])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -18,10 +18,16 @@ data.
 | Provider | Service | Status | Authentication | Last real validation |
 |---|---|---|---|---|
 | Freebox Internet | `free` | Beta | Username/password, no MFA observed | 2026-07-27 |
+| Fulli Toll | `fulli` | Beta | Username/password, no MFA observed | 2026-09-27 |
 
 The Free recipe downloaded 19 historical invoices during its initial
 end-to-end validation. That result does not guarantee that Free's portal is
 unchanged today.
+
+The Fulli recipe completed an isolated end-to-end validation against the real
+account: 14 PDF invoices were published on the first run, and the second run
+published no new files while skipping all 14 known documents. This validation
+does not deploy or schedule the recipe.
 
 ## Installation
 
@@ -118,6 +124,25 @@ BillCollector derives:
 - recipe filename: `bc-recipe__free.yaml`;
 - exact Bitwarden item name: `Free Home`.
 
+For Fulli, use the stable customer portal URL in the Bitwarden item:
+
+```text
+Name: Fulli Toll
+Username: your Fulli email address or customer number
+Password: your Fulli password
+URI: https://www.fulli.com/customer/login
+```
+
+Then select the beta recipe with:
+
+```ini
+Fulli [Toll]
+```
+
+The Fulli login page may present a FriendlyCaptcha challenge. BillCollector
+does not bypass it; authenticated validation must stop if human interaction is
+required.
+
 The suffix is only a local account label. It must not be added to the recipe.
 
 ## Repository structure
@@ -157,6 +182,7 @@ Every recipe declares:
 BillCollector images. Until BillCollector has stable semantic releases,
 `minimumRevision` remains the human-readable image baseline. For the first Free
 recipe, use an image containing revision `06f1d27` or later.
+The Fulli recipe requires revision `5353ec5` or later for bounded pagination.
 
 An incompatible recipe must fail CI before release and stop explicitly at
 runtime before any provider login is attempted.
