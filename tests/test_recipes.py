@@ -66,6 +66,28 @@ class RecipeRepositoryTests(unittest.TestCase):
         expected = f"bc-metadata__{metadata['service']}.yaml"
         self.assertEqual(expected, "bc-metadata__free.yaml")
 
+    def test_fulli_recipe_matches_the_public_two_step_login(self):
+        recipe = yaml.safe_load(
+            (ROOT / "recipes" / "fulli" / "bc-recipe__fulli.yaml")
+            .read_text()
+        )
+        actions = recipe["services"][0]["actions"]
+        self.assertEqual(
+            ["SendKeys", "Click", "SendKeys", "Click"],
+            [action["actionType"] for action in actions],
+        )
+        self.assertEqual(
+            ["identifier", "otp-submit-btn", "password", "pass-submit-btn"],
+            [action["parameters"]["locators"][0]["element"]
+             for action in actions],
+        )
+        self.assertEqual(
+            "{USERNAME}", actions[0]["parameters"]["variable"]
+        )
+        self.assertEqual(
+            "{PASSWORD}", actions[2]["parameters"]["variable"]
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

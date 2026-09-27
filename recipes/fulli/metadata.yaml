@@ -1,0 +1,18 @@
+---
+provider: "Fulli"
+product: "Fulli Toll"
+service: "fulli"
+recipeVersion: "0.1.0"
+recipeFormatVersion: 1
+status: "experimental"
+minimumRevision: "06f1d27"
+requiredActions:
+  - "SendKeys"
+  - "Click"
+authentication:
+  usernamePassword: true
+  mfa: false
+startUrl: "https://www.fulli.com/customer/login"
+validation:
+  lastTested: "2026-09-27"
+  scope: "Public two-step login DOM only; authenticated login and invoice retrieval not yet tested"

@@ -18,10 +18,15 @@ data.
 | Provider | Service | Status | Authentication | Last real validation |
 |---|---|---|---|---|
 | Freebox Internet | `free` | Beta | Username/password, no MFA observed | 2026-07-27 |
+| Fulli Toll | `fulli` | Experimental | Username/password, no MFA reported | Not yet validated |
 
 The Free recipe downloaded 19 historical invoices during its initial
 end-to-end validation. That result does not guarantee that Free's portal is
 unchanged today.
+
+The Fulli recipe currently covers only the public two-step login flow. It does
+not yet include authenticated invoice navigation or downloads and must not be
+scheduled.
 
 ## Installation
 
@@ -117,6 +122,25 @@ BillCollector derives:
 
 - recipe filename: `bc-recipe__free.yaml`;
 - exact Bitwarden item name: `Free Home`.
+
+For Fulli, use the stable customer portal URL in the Bitwarden item:
+
+```text
+Name: Fulli Toll
+Username: your Fulli email address or customer number
+Password: your Fulli password
+URI: https://www.fulli.com/customer/login
+```
+
+Then select the experimental recipe with:
+
+```ini
+Fulli [Toll]
+```
+
+The Fulli login page may present a FriendlyCaptcha challenge. BillCollector
+does not bypass it; authenticated validation must stop if human interaction is
+required.
 
 The suffix is only a local account label. It must not be added to the recipe.
 

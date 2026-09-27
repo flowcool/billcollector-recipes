@@ -1,0 +1,38 @@
+---
+services:
+  - serviceName: "fulli"
+    actions:
+      - step: 1
+        description: "Enter the Fulli email address or customer number."
+        actionType: "SendKeys"
+        parameters:
+          locators:
+            - locatorType: "ID"
+              element: "identifier"
+          variable: "{USERNAME}"
+          timeout: 30
+      - step: 2
+        description: "Continue to the Fulli password screen."
+        actionType: "Click"
+        parameters:
+          locators:
+            - locatorType: "ID"
+              element: "otp-submit-btn"
+          timeout: 30
+      - step: 3
+        description: "Enter the Fulli password."
+        actionType: "SendKeys"
+        parameters:
+          locators:
+            - locatorType: "ID"
+              element: "password"
+          variable: "{PASSWORD}"
+          timeout: 30
+      - step: 4
+        description: "Submit the Fulli login form."
+        actionType: "Click"
+        parameters:
+          locators:
+            - locatorType: "ID"
+              element: "pass-submit-btn"
+          timeout: 30
