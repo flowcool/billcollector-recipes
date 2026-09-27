@@ -5,14 +5,16 @@ service: "fulli"
 recipeVersion: "0.1.0"
 recipeFormatVersion: 1
 status: "experimental"
-minimumRevision: "06f1d27"
+minimumRevision: "5353ec5"
 requiredActions:
   - "SendKeys"
   - "Click"
+  - "ClickUntilAbsent"
+  - "DownloadAll"
 authentication:
   usernamePassword: true
   mfa: false
 startUrl: "https://www.fulli.com/customer/login"
 validation:
   lastTested: "2026-09-27"
-  scope: "Public two-step login DOM only; authenticated login and invoice retrieval not yet tested"
+  scope: "Authenticated login and invoice-history DOM validated; pagination and downloads not yet executed"

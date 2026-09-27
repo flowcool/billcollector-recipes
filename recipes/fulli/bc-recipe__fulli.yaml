@@ -36,3 +36,30 @@ services:
             - locatorType: "ID"
               element: "pass-submit-btn"
           timeout: 30
+      - step: 5
+        description: "Open the Fulli invoice history."
+        actionType: "Click"
+        parameters:
+          locators:
+            - locatorType: "XPATH"
+              element: "//a[@href='/espace-client/factures' and contains(concat(' ', normalize-space(@class), ' '), ' Button ')]"
+          timeout: 30
+      - step: 6
+        description: "Load every page of the Fulli invoice history."
+        actionType: "ClickUntilAbsent"
+        parameters:
+          locators:
+            - locatorType: "ID"
+              element: "js--transactions-invoices-pager"
+            - locatorType: "XPATH"
+              element: "//ul[@id='js--transactions-list']/li[contains(concat(' ', normalize-space(@class), ' '), ' data-list__item ')]//a[starts-with(@href, '/customer-space/invoice/download/')]"
+          timeout: 30
+          maxClicks: 20
+      - step: 7
+        description: "Download every PDF invoice from the Fulli history list."
+        actionType: "DownloadAll"
+        parameters:
+          locators:
+            - locatorType: "XPATH"
+              element: "//ul[@id='js--transactions-list']/li[contains(concat(' ', normalize-space(@class), ' '), ' data-list__item ')]//a[starts-with(@href, '/customer-space/invoice/download/')]"
+          timeout: 60

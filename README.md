@@ -24,9 +24,9 @@ The Free recipe downloaded 19 historical invoices during its initial
 end-to-end validation. That result does not guarantee that Free's portal is
 unchanged today.
 
-The Fulli recipe currently covers only the public two-step login flow. It does
-not yet include authenticated invoice navigation or downloads and must not be
-scheduled.
+The Fulli recipe covers the authenticated two-step login and the observed
+invoice-history structure. Its bounded pagination and downloads are not yet
+validated against the real account, so it must not be scheduled.
 
 ## Installation
 
@@ -181,6 +181,7 @@ Every recipe declares:
 BillCollector images. Until BillCollector has stable semantic releases,
 `minimumRevision` remains the human-readable image baseline. For the first Free
 recipe, use an image containing revision `06f1d27` or later.
+The Fulli recipe requires revision `5353ec5` or later for bounded pagination.
 
 An incompatible recipe must fail CI before release and stop explicitly at
 runtime before any provider login is attempted.

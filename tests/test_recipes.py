@@ -66,18 +66,39 @@ class RecipeRepositoryTests(unittest.TestCase):
         expected = f"bc-metadata__{metadata['service']}.yaml"
         self.assertEqual(expected, "bc-metadata__free.yaml")
 
-    def test_fulli_recipe_matches_the_public_two_step_login(self):
+    def test_fulli_recipe_matches_the_validated_flow(self):
         recipe = yaml.safe_load(
             (ROOT / "recipes" / "fulli" / "bc-recipe__fulli.yaml")
             .read_text()
         )
         actions = recipe["services"][0]["actions"]
         self.assertEqual(
-            ["SendKeys", "Click", "SendKeys", "Click"],
+            [
+                "SendKeys",
+                "Click",
+                "SendKeys",
+                "Click",
+                "Click",
+                "ClickUntilAbsent",
+                "DownloadAll",
+            ],
             [action["actionType"] for action in actions],
         )
         self.assertEqual(
-            ["identifier", "otp-submit-btn", "password", "pass-submit-btn"],
+            [
+                "identifier",
+                "otp-submit-btn",
+                "password",
+                "pass-submit-btn",
+                "//a[@href='/espace-client/factures' and "
+                "contains(concat(' ', normalize-space(@class), ' '), "
+                "' Button ')]",
+                "js--transactions-invoices-pager",
+                "//ul[@id='js--transactions-list']/li[contains(concat(' ', "
+                "normalize-space(@class), ' '), ' data-list__item ')]"
+                "//a[starts-with(@href, "
+                "'/customer-space/invoice/download/')]",
+            ],
             [action["parameters"]["locators"][0]["element"]
              for action in actions],
         )
@@ -87,6 +108,11 @@ class RecipeRepositoryTests(unittest.TestCase):
         self.assertEqual(
             "{PASSWORD}", actions[2]["parameters"]["variable"]
         )
+        self.assertEqual(
+            actions[5]["parameters"]["locators"][1]["element"],
+            actions[6]["parameters"]["locators"][0]["element"],
+        )
+        self.assertEqual(20, actions[5]["parameters"]["maxClicks"])
 
 
 if __name__ == "__main__":

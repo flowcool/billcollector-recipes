@@ -33,6 +33,7 @@
                     "SwitchToDefaultFrame",
                     "SwitchToFrame",
                     "Click",
+                    "ClickUntilAbsent",
                     "ClickShadow",
                     "SendKeys",
                     "Download",
@@ -73,6 +74,11 @@
                       ]
                     },
                     "timeout": {"type": "integer", "minimum": 1},
+                    "maxClicks": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 100
+                    },
                     "graceful": {"type": "boolean"}
                   }
                 }
@@ -90,6 +96,23 @@
                     }
                   },
                   "else": {"required": ["parameters"]}
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "actionType": {"const": "ClickUntilAbsent"}
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "parameters": {
+                        "required": ["locators"],
+                        "properties": {
+                          "locators": {"minItems": 2, "maxItems": 2}
+                        }
+                      }
+                    }
+                  }
                 }
               ]
             }
