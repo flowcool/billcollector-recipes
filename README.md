@@ -21,6 +21,7 @@ data.
 | Fulli Toll | `fulli` | Beta | Username/password, no MFA observed | 2026-09-27 |
 | Mint Energie | `mint_energie` | Beta | Username/password, no MFA observed | 2026-09-27 |
 | Octopus Energy France | `octopus_energy` | Beta | Username/password, no MFA observed | 2026-09-27 |
+| CC Genevois Water | `cc_genevois` | Beta | Username/password, no MFA observed | Pending |
 
 The Free recipe downloaded 19 historical invoices during its initial
 end-to-end validation. That result does not guarantee that Free's portal is
@@ -183,6 +184,16 @@ Octopus Energy
 The initial recipe downloads the payment schedule currently exposed by the
 account. Invoice collection can be added after an issued invoice is available
 for selector validation.
+
+For CC Genevois, name the Bitwarden item exactly `CC Genevois` and set its URI
+to `https://abonnes.cc-genevois.fr`. Then add this line to
+`billcollector.ini`:
+
+```ini
+CC Genevois
+```
+
+The recipe signs in, opens the invoice list, and downloads every available PDF.
 
 The suffix is only a local account label. It must not be added to the recipe.
 
