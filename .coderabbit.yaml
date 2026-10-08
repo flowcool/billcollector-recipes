@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=https://www.coderabbit.ai/integrations/schema.v2.json
+language: en-US
+inheritance: true
+reviews:
+  profile: chill
+  poem: false
+  in_progress_fortune: false
+  review_status: true
+  auto_review:
+    enabled: true
+    drafts: false
+  path_instructions:
+    - path: "recipes/**/*.yaml"
+      instructions: >-
+        Check against the repository recipe and metadata schemas and the
+        supported engine actions. Prioritize robust selectors, bounded waits,
+        authentication flow, pagination and download completion. Check that
+        repeated runs do not duplicate documents. Flag embedded credentials,
+        private account identifiers and customer data. Use synthetic fixtures
+        and isolated download/state directories for verification; do not request
+        execution against live portals or a production document consumer.
+    - path: "tests/**/*.py"
+      instructions: >-
+        Check that schema and recipe validation cover malformed inputs and
+        unsupported actions using synthetic fixtures. Tests must not access
+        live portals, vaults, browser profiles or customer documents.
+chat:
+  art: false
