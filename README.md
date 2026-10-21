@@ -9,6 +9,11 @@ Recipes describe how BillCollector navigates a provider portal and downloads
 documents. They contain selectors and actions, never credentials or customer
 data.
 
+The current catalog uses the Selenium recipe format. Playwright migration is
+under study. See the [migration proposal](docs/plans/playwright-migration.md)
+and the [upstream source assessment](docs/research/upstream-playwright-contract.md).
+No Playwright recipes or exporter are available in this repository yet.
+
 > [!WARNING]
 > This repository is beta. Provider portals can change without notice. Pin a
 > release, test updates manually, and keep the previous release for rollback.
