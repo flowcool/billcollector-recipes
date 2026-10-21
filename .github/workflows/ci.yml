@@ -28,3 +28,8 @@ jobs:
           ./scripts/export-recipes.sh . ./export
           test -f ./export/bc-recipe__free.yaml
           test -f ./export/bc-metadata__free.yaml
+      - run: |
+          ./scripts/export-playwright-recipes.sh . ./export/playwright \
+            --engine-revision 501898cade0b9981092db2011fb3fc02812af8b3
+          test -f ./export/playwright/recipe-pw__free.yaml
+          test -f ./export/playwright/recipe-pw-schema.yaml

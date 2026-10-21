@@ -9,16 +9,61 @@ Recipes describe how BillCollector navigates a provider portal and downloads
 documents. They contain selectors and actions, never credentials or customer
 data.
 
-The current catalog uses the Selenium recipe format. Playwright migration is
-under study. See the [migration proposal](docs/plans/playwright-migration.md)
-and the [upstream source assessment](docs/research/upstream-playwright-contract.md).
-No Playwright recipes or exporter are available in this repository yet.
+The Selenium catalog remains available. A separate experimental Playwright
+catalog provides supervised navigation and one tracked document per provider.
+See the [migration plan](docs/plans/playwright-migration.md) and the
+[engine source assessment](docs/research/upstream-playwright-contract.md).
+The validation dates below apply only to Selenium.
 
 > [!WARNING]
 > This repository is beta. Provider portals can change without notice. Pin a
 > release, test updates manually, and keep the previous release for rollback.
 
-## Available recipes
+## Experimental Playwright ports
+
+| Service | Coverage | Limit |
+|---|---|---|
+| `octopus_energy` | One payment schedule | No issued invoices; select the intended agreement. |
+| `free` | First listed invoice | No collection loop or latest-order guarantee. |
+| `mint_energie` | First listed PDF | Public login only; requires a browser download event. |
+| `cc_genevois` | First listed download control | No collection loop or popup support. |
+| `fulli` | First listed invoice | Initial list only; no load-more or pagination. |
+
+All five ports require operator login, consent and account selection through
+`wait_user`. They do not submit credentials. Real-provider validation has not run.
+See each `playwright/<service>/metadata.yaml` for exact limits.
+
+Export to a fresh release directory with the exact selected engine revision:
+
+```bash
+uv pip install --python .venv/bin/python -r requirements-dev.txt
+PYTHON=.venv/bin/python ./scripts/export-playwright-recipes.sh . ./export/playwright \
+  --engine-revision 501898cade0b9981092db2011fb3fc02812af8b3
+```
+
+The export includes the runtime schema and five recipes. It excludes catalog
+metadata. It refuses mixed or unmanaged recipe directories. Use it only for
+release preparation. Import and real runs require the infrastructure operation
+plan. Do not point it at a live daemon recipe directory.
+Keep the task identity stable. Selenium history does not populate SQLite.
+The file-publication/SQLite interruption window is not safe for Paperless cutover.
+
+Run isolated engine proof with an existing Git repository containing the pinned
+engine revision. The launcher archives it into a temporary directory. It uses
+synthetic browser routes and separate database, output and profile paths.
+
+```bash
+uv pip install --python .venv/bin/python -r requirements-engine-tests.txt
+.venv/bin/python -m playwright install chromium
+.venv/bin/python tests/engine_probe.py /path/to/BillCollector
+```
+
+This exercises actual daemon dispatch and download tracking with headless
+Chromium. The launcher and operator resume are test adapters. It does not prove
+headful display allocation, vault lookup or real login behavior. Playwright
+1.58.0 is the test client, not evidence for the deployed image dependency set.
+
+## Available Selenium recipes
 
 | Provider | Service | Status | Authentication | Last real validation |
 |---|---|---|---|---|

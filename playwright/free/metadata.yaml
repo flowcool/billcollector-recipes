@@ -1,0 +1,18 @@
+service: free
+engine: playwright-daemon
+engineRevision: 501898cade0b9981092db2011fb3fc02812af8b3
+status: experimental
+coverage: first-listed-document
+limitations:
+- Supervised login and consent are required on every run; no automatic credential
+  submission.
+- Provider selectors, account selection and download events have not been checked
+  on a real account.
+- An empty list fails; a known-content download can succeed without a new publication.
+- Task-scoped SQLite history is not imported from Selenium; keep output disconnected
+  from Paperless.
+- Only the first DOM match is selected; newest order and complete collection are not
+  guaranteed.
+validation:
+  synthetic: tests/engine_probe.py
+  realProvider: not-run

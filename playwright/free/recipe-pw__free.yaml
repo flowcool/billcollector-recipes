@@ -1,0 +1,44 @@
+services:
+- serviceName: free
+  steps:
+  - step: 1
+    description: Open the public login page.
+    methods:
+    - method: goto
+      arguments:
+      - url: https://subscribe.free.fr/login/
+  - step: 2
+    description: Complete login and consent, or confirm the existing session.
+    methods:
+    - method: wait_user
+      arguments:
+      - prompt: Complete login and consent in the browser. Select the intended account.
+          Resume only when the account page is ready.
+        until:
+          selector: xpath=//a[contains(@href, 'facture_liste.pl') and @title='Voir
+            toutes mes factures']
+  - step: 3
+    description: Open the complete Freebox invoice history.
+    methods:
+    - method: locator
+      arguments:
+      - selector: xpath=//a[contains(@href, 'facture_liste.pl') and @title='Voir toutes
+          mes factures']
+    - method: click
+      arguments:
+      - timeout: 30000
+  - step: 4
+    description: Download only the first listed document. Order is not verified.
+    methods:
+    - method: expect_download
+    steps:
+    - step: 1
+      methods:
+      - method: locator
+        arguments:
+        - selector: xpath=//a[contains(@href, 'facture_pdf.pl') and contains(@class,
+            'btn_download') and @title='Télécharger votre facture en PDF']
+      - method: first
+      - method: click
+        arguments:
+        - timeout: 30000

@@ -75,4 +75,21 @@ The new redaction behavior is implemented in [redaction.py](https://github.com/s
 
 The research inspected one clean upstream clone and read the selected fork commit without modifying its checkout. It compared the runner, config, vault, recipe schema, and download tracker. Vault and schema were identical. The fork also has path-component validation and a guard against an unbounded zero-timeout `wait_user` check. No recipe execution, browser launch, vault access, provider access, or runtime mutation occurred. The system Python lacks pytest. No dependency installation was needed for this source review.
 
-Before a provider can migrate, prove its task/vault mapping, start URL policy, session reuse, full collection bounds, download transport, duplicate behavior, and second-run result against synthetic fixtures. Then obtain a separate approved operation plan for authenticated provider validation. Provider selectors, account-specific URLs, and the completeness of real document history remain unknown until that validation.
+For current-engine catalog ports, prove the supported navigation and single-download path against isolated synthetic fixtures. Record partial coverage explicitly. Full collection and pagination do not gate these ports: Selenium already collected historical invoices. The collection prototype remains engine work to continue. Task/vault mapping, real session behavior and provider selectors require a separate approved operation plan before authenticated validation. SQLite history continuity and interrupted publication remain cutover gates. See the revised migration plan for the authorized scope.
+
+
+## Isolated follow-up proof (2026-10-21)
+
+`tests/engine_probe.py --crash-only` reproduces a process death at the SQLite
+insertion boundary against both exact baselines. Each test uses synthetic bytes,
+a temporary SQLite database, one stable task and a temporary output directory.
+Immediately after death: one published file and zero Download rows.
+After retry: upstream has one rewritten filename and two consumer calls; the
+fork has two files with identical SHA-256 and two consumer calls. Each database
+contains one Download row. This confirms the earlier interruption inference.
+
+Public upstream main was still `c539b3420d0495ee6c4133e88e3a74e6e98740ad`.
+The all-state issue list contained no matching report before creation.
+[Issue #24](https://github.com/s-t-e-f-a-n/BillCollector/issues/24) contains a
+self-contained synthetic reproduction and asks for the recovery contract.
+It does not request a recipe-interface change or claim exactly-once delivery.

@@ -16,10 +16,12 @@ Use a disposable destination: this command replaces matching recipe files.
 
 ## Compatibility
 
-`recipes/`, `schema/` and the current exporter implement the Selenium contract.
+`recipes/`, the root schemas and `scripts/export-recipes.sh` implement the Selenium contract.
 For a Playwright port or export change, first read
 `docs/plans/playwright-migration.md` and its linked source assessment.
-The proposed Playwright layout is not implemented.
+`playwright/`, `schema/playwright/` and `scripts/export-playwright-recipes.sh`
+implement experimental supervised single-document ports. Metadata records limits.
+`tests/engine_probe.py` runs synthetic proof from an exact archived engine revision.
 Validate against the exact engine revision that will load a recipe.
 Keep historical Selenium validation separate from new Playwright evidence.
 

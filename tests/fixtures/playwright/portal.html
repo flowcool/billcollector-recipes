@@ -1,0 +1,17 @@
+<!doctype html><html><head><meta charset="utf-8"></head><body>
+<!-- Synthetic public selectors only. Links intentionally list older content first. -->
+<a href="/facture_liste.pl" title="Voir toutes mes factures">History</a>
+<a href="/facture_pdf.pl?id=older" class="btn_download" title="Télécharger votre facture en PDF">Older</a>
+<a href="/facture_pdf.pl?id=newer" class="btn_download" title="Télécharger votre facture en PDF">Newer</a>
+<a href="/Pages/Compte/factures_liste.aspx">Invoices</a>
+<a href="/synthetic-older.pdf">Afficher le PDF</a><a href="/synthetic-newer.pdf">Afficher le PDF</a>
+<a href="/factures">Invoices</a>
+<div class="svg-link__block" title="Télécharger" onclick="location.href='/synthetic-older.pdf'">Older</div>
+<div class="svg-link__block" title="Télécharger" onclick="location.href='/synthetic-newer.pdf'">Newer</div>
+<a href="/espace-client/factures" class="Button">Invoices</a>
+<ul id="js--transactions-list"><li class="data-list__item"><a href="/customer-space/invoice/download/older">Older</a></li><li class="data-list__item"><a href="/customer-space/invoice/download/newer">Newer</a></li></ul>
+<button id="js--transactions-invoices-pager" onclick="throw Error('Pagination must not run')">More</button>
+<a href="/factures-et-paiements">Bills</a>
+<a href="/factures-et-paiements/agreement">Agreement</a>
+<button onclick="location.href='/synthetic-schedule.pdf'">Mon échéancier de paiement</button>
+</body></html>

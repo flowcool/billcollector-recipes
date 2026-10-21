@@ -1,0 +1,6 @@
+-r requirements-dev.txt
+playwright==1.58.0
+requests==2.34.2
+flatten-json==0.1.14
+sshkeyboard==2.3.1
+python-dotenv==1.2.4
