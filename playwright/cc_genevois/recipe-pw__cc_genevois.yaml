@@ -1,0 +1,42 @@
+services:
+- serviceName: cc_genevois
+  steps:
+  - step: 1
+    description: Open the public login page.
+    methods:
+    - method: goto
+      arguments:
+      - url: https://abonnes.cc-genevois.fr
+  - step: 2
+    description: Complete login and consent, or confirm the existing session.
+    methods:
+    - method: wait_user
+      arguments:
+      - prompt: Complete login and consent in the browser. Select the intended account.
+          Resume only when the account page is ready.
+        until:
+          selector: xpath=//a[@href='/factures']
+  - step: 3
+    description: Open the CC Genevois invoice list.
+    methods:
+    - method: locator
+      arguments:
+      - selector: xpath=//a[@href='/factures']
+    - method: click
+      arguments:
+      - timeout: 30000
+  - step: 4
+    description: Download only the first listed document. Order is not verified.
+    methods:
+    - method: expect_download
+    steps:
+    - step: 1
+      methods:
+      - method: locator
+        arguments:
+        - selector: xpath=//div[contains(concat(' ', normalize-space(@class), ' '),
+            ' svg-link__block ') and @title='Télécharger']
+      - method: first
+      - method: click
+        arguments:
+        - timeout: 60000

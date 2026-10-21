@@ -1,0 +1,45 @@
+services:
+- serviceName: fulli
+  steps:
+  - step: 1
+    description: Open the public login page.
+    methods:
+    - method: goto
+      arguments:
+      - url: https://www.fulli.com/customer/login
+  - step: 2
+    description: Complete login and consent, or confirm the existing session.
+    methods:
+    - method: wait_user
+      arguments:
+      - prompt: Complete login and consent in the browser. Select the intended account.
+          Resume only when the account page is ready.
+        until:
+          selector: xpath=//a[@href='/espace-client/factures' and contains(concat('
+            ', normalize-space(@class), ' '), ' Button ')]
+  - step: 3
+    description: Open the Fulli invoice history.
+    methods:
+    - method: locator
+      arguments:
+      - selector: xpath=//a[@href='/espace-client/factures' and contains(concat('
+          ', normalize-space(@class), ' '), ' Button ')]
+    - method: click
+      arguments:
+      - timeout: 30000
+  - step: 4
+    description: Download only the first listed document. Order is not verified.
+    methods:
+    - method: expect_download
+    steps:
+    - step: 1
+      methods:
+      - method: locator
+        arguments:
+        - selector: xpath=//ul[@id='js--transactions-list']/li[contains(concat(' ',
+            normalize-space(@class), ' '), ' data-list__item ')]//a[starts-with(@href,
+            '/customer-space/invoice/download/')]
+      - method: first
+      - method: click
+        arguments:
+        - timeout: 60000

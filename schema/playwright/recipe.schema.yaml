@@ -1,0 +1,61 @@
+---
+$schema: "http://json-schema.org/draft-07/schema#"
+title: "Recipe Playwright YAML Schema"
+type: object
+properties:
+  $schema:
+    type: string
+  services:
+    type: array
+    items:
+      type: object
+      required:
+        - serviceName
+        - steps
+      properties:
+        serviceName:
+          type: string
+        description:
+          type: string
+        steps:
+          type: array
+          items:
+            $ref: "#/definitions/step"
+definitions:
+  step:
+    type: object
+    required:
+      - step
+    properties:
+      step:
+        type: integer
+      description:
+        type: string
+      graceful:
+        type: boolean
+        description: >-
+          If true, a failure of this step is recorded in the log and the DB but
+          the run continues with the next step. If false (default), a failure
+          aborts the run.
+      methods:
+        type: array
+        items:
+          $ref: "#/definitions/method"
+      steps:
+        type: array
+        items:
+          $ref: "#/definitions/step"
+  method:
+    type: object
+    required:
+      - method
+    properties:
+      method:
+        type: string
+      arguments:
+        type: array
+        items:
+          type: object
+          additionalProperties:
+            type: [ "string", "boolean", "number", "object", "null" ]
+additionalProperties: false
