@@ -13,3 +13,18 @@ Actions are pinned to immutable commits and use read-only contents permissions.
 Only CodeQL jobs receive security-events write access for analysis uploads.
 Future GitHub releases are immutable. Configure a release as a draft, attach its
 assets, then publish; published tags/assets cannot be replaced in place.
+
+
+## Documentation-only checks
+
+Markdown-only pull requests and branch pushes run lightweight classification
+and the required `Catalog CI` / `Catalog security` gates. Catalog tests,
+dependency audit and CodeQL jobs report skipped. YAML recipes, metadata,
+workflow or code changes run every check. Tags, schedules and manual runs use
+full validation. A classification failure blocks both gates.
+
+The required security gate verifies successful Python and Actions CodeQL
+analyses for the exact commit and rejects open error-level or high/critical
+security alerts. GitHub's unconditional code-scanning rule is replaced by this
+required conditional gate. Existing required check names remain configured;
+they report skipped on Markdown changes. No code change gets a scan bypass.
