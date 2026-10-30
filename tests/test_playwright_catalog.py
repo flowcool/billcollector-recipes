@@ -195,6 +195,27 @@ class PlaywrightCatalogTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.export()
 
+    def test_bd_intake_is_required_and_invalid_scope_keeps_previous_export(self):
+        import copy
+        self.export()
+        before = self.snapshot()
+        path = self.source / 'playwright/bourse_direct/metadata.yaml'
+        original = yaml.safe_load(path.read_text())
+        missing = copy.deepcopy(original)
+        del missing['scope']
+        bad_bound = copy.deepcopy(original)
+        bad_bound['scope']['history']['maxMonths'] = 14
+        no_control = copy.deepcopy(original)
+        no_control['scope']['history']['controlRunRequired'] = False
+        unexplained = copy.deepcopy(original)
+        del unexplained['scope']['families']['tax_documents']['reason']
+        for data in (missing, bad_bound, no_control, unexplained):
+            with self.subTest(data=data):
+                path.write_text(yaml.safe_dump(data))
+                with self.assertRaises(ValidationError):
+                    self.export()
+                self.assertEqual(before, self.snapshot())
+
 
 class BourseDirectCatalogTests(unittest.TestCase):
     def test_history_recipe_is_experimental_and_preserves_incremental_default(self):

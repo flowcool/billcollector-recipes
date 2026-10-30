@@ -17,3 +17,42 @@ limitations:
 validation:
   synthetic: tests/bourse_direct_engine_probe.py
   realProvider: not-run
+scope:
+  families:
+    operation_notices:
+      status: implemented
+      availability: observed
+      reason: Approved notice-only scope. Retained PEA provider proof; PEA-PME has synthetic coverage only.
+      extension: Qualify each additional account on the exact recipe and engine before enabling it.
+    statements:
+      status: documented
+      availability: unverified
+      reason: Outside the approved scope; portal availability and history are not verified.
+      extension: Inventory the portal family, key and history under a separate provider scope decision.
+    tax_documents:
+      status: documented
+      availability: unverified
+      reason: IFU and other tax documents are outside scope; availability is not verified.
+      extension: Inventory the tax section and document keys before a separate implementation decision.
+    other_documents:
+      status: documented
+      availability: unverified
+      reason: No exhaustive live family inventory is claimed; no new portal connection was authorized for this P1.
+      extension: Read-only family inventory under a later provider scope decision.
+  history:
+    maxMonths: 13
+    observedOldestMonth: '2025-10'
+    incrementalWindow: Task date_window_days, default 90; explicit recovery start wins within recipe bounds.
+    controlRunRequired: true
+  stableKey: [nc, type, year, month, day]
+  limits:
+  - GetAll includes the current month and at most 12 preceding offered months; incremental keeps its recent window.
+  - max_items 100 and timeout_ms 7200000; calendar reset to current month fails closed.
+  - Separate durable login and document gates; login minimum 60 seconds, document default 5 seconds.
+  - Stop after the safe-login failure budget; no automatic retry after an uncertain login outcome.
+  - Infra owns the periodic full-window control run and alerting; cadence is not set by this catalog.
+  evidence:
+  - Old PEA provider proof covered five October 2026 notices and zero new files on repeat, on an older artifact.
+  - The 2025-10 history boundary is a retained October 2026 observation, not a new portal measurement.
+  - Current recipe has synthetic exact-engine proof only; PEA-PME has no live qualification.
+  - Operator approved operation notices only, with no fresh portal connection for this P1.

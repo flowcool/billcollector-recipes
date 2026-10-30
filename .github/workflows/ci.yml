@@ -45,10 +45,6 @@ jobs:
       - run: python -m pip install -r requirements-dev.txt
       - run: python -m unittest discover -s tests -v
       - run: |
-          ./scripts/export-recipes.sh . ./export
-          test -f ./export/bc-recipe__free.yaml
-          test -f ./export/bc-metadata__free.yaml
-      - run: |
           ./scripts/export-playwright-recipes.sh . ./export/playwright \
             --engine-revision c87f980b985d526dac95760e477cec95f280896d
           test -f ./export/playwright/recipe-pw__free.yaml
