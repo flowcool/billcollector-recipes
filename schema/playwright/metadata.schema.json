@@ -20,7 +20,10 @@
       "const": "playwright-daemon"
     },
     "engineRevision": {
-      "const": "45e530b7d6240abb308810183dbe4f65aae5b6dc"
+      "enum": [
+        "45e530b7d6240abb308810183dbe4f65aae5b6dc",
+        "c87f980b985d526dac95760e477cec95f280896d"
+      ]
     },
     "status": {
       "enum": [
@@ -32,7 +35,8 @@
       "enum": [
         "single-payment-schedule",
         "first-listed-document",
-        "all-available-invoices"
+        "all-available-invoices",
+        "offered-operation-notices"
       ]
     },
     "limitations": {
@@ -54,7 +58,8 @@
         "synthetic": {
           "enum": [
             "tests/engine_probe.py",
-            "tests/unattended_engine_probe.py"
+            "tests/unattended_engine_probe.py",
+            "tests/bourse_direct_engine_probe.py"
           ]
         },
         "realProvider": {

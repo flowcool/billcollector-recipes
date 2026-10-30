@@ -32,9 +32,9 @@ class PlaywrightCatalogTests(unittest.TestCase):
     def snapshot(self):
         return {p.name: p.read_bytes() for p in self.dest.iterdir()}
 
-    def test_five_ports_and_repeat_export_preserve_unrelated_files(self):
+    def test_six_ports_and_repeat_export_preserve_unrelated_files(self):
         self.export()
-        self.assertEqual(len(list(self.dest.glob("recipe-pw__*.yaml"))), 5)
+        self.assertEqual(len(list(self.dest.glob("recipe-pw__*.yaml"))), 6)
         self.assertFalse(list(self.dest.glob("*metadata*")))
         (self.dest / "keep.txt").write_text("keep")
         before = self.snapshot()
@@ -194,3 +194,29 @@ class PlaywrightCatalogTests(unittest.TestCase):
         recipe.symlink_to(self.source / "playwright/free/recipe-pw__free.yaml")
         with self.assertRaises(ValueError):
             self.export()
+
+
+class BourseDirectCatalogTests(unittest.TestCase):
+    def test_history_recipe_is_experimental_and_preserves_incremental_default(self):
+        metadata = yaml.safe_load((ROOT / 'playwright/bourse_direct/metadata.yaml').read_text())
+        self.assertEqual(metadata['status'], 'experimental')
+        self.assertEqual(metadata['validation']['realProvider'], 'not-run')
+        recipe = yaml.safe_load((ROOT / 'playwright/bourse_direct/recipe-pw__bourse_direct.yaml').read_text())
+        step = recipe['services'][0]['steps'][1]
+        self.assertEqual(step['notice_identity']['query_parameters'], ['nc', 'type', 'year', 'month', 'day'])
+        options = step['methods'][-1]['arguments'][0]
+        self.assertEqual(options['max_months'], 13)
+        self.assertTrue(options['incremental'])
+        self.assertEqual(options['max_items'], 100)
+        self.assertEqual(options['timeout_ms'], 7200000)
+        module.check_steps(recipe['services'][0]['steps'])
+
+    def test_unsupported_history_or_disabled_incremental_is_rejected(self):
+        import copy
+        recipe = yaml.safe_load((ROOT / 'playwright/bourse_direct/recipe-pw__bourse_direct.yaml').read_text())
+        for change in ({'max_months': 14}, {'max_months': True}, {'incremental': False}, {'max_items': 99}):
+            with self.subTest(change=change):
+                altered = copy.deepcopy(recipe)
+                altered['services'][0]['steps'][1]['methods'][-1]['arguments'][0].update(change)
+                with self.assertRaises(ValueError):
+                    module.check_steps(altered['services'][0]['steps'])
