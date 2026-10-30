@@ -10,7 +10,27 @@ permissions:
   contents: read
 
 jobs:
+  changes:
+    name: Classify catalog inputs
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      full: ${{ steps.scope.outputs.full }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - id: scope
+        env:
+          CI_EVENT: ${{ github.event_name }}
+          CI_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+          CI_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: python3 scripts/ci_scope.py --output "$GITHUB_OUTPUT"
+
   validate:
+    needs: changes
+    if: needs.changes.outputs.full != 'false'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -33,3 +53,24 @@ jobs:
             --engine-revision c87f980b985d526dac95760e477cec95f280896d
           test -f ./export/playwright/recipe-pw__free.yaml
           test -f ./export/playwright/recipe-pw-schema.yaml
+
+  gate:
+    name: Catalog CI
+    needs: [changes, validate]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - env:
+          CLASSIFIED: ${{ needs.changes.result }}
+          FULL: ${{ needs.changes.outputs.full }}
+          VALIDATION: ${{ needs.validate.result }}
+        run: |
+          test "$CLASSIFIED" = success
+          if [ "$FULL" = false ]; then
+            test "$VALIDATION" = skipped
+            echo 'Markdown-only change: catalog validation is not needed.'
+          else
+            test "$FULL" = true
+            test "$VALIDATION" = success
+          fi

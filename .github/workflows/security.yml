@@ -16,7 +16,27 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  changes:
+    name: Classify catalog inputs
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      full: ${{ steps.scope.outputs.full }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - id: scope
+        env:
+          CI_EVENT: ${{ github.event_name }}
+          CI_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+          CI_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: python3 scripts/ci_scope.py --output "$GITHUB_OUTPUT"
+
   python-security:
+    needs: changes
+    if: needs.changes.outputs.full != 'false'
     name: Python security
     runs-on: ubuntu-24.04
     timeout-minutes: 15
@@ -31,6 +51,8 @@ jobs:
       - run: pip-audit -r requirements-dev.txt --disable-pip --no-deps --progress-spinner off
 
   codeql:
+    needs: changes
+    if: needs.changes.outputs.full != 'false'
     name: CodeQL (${{ matrix.language }})
     runs-on: ubuntu-24.04
     timeout-minutes: 30
@@ -52,3 +74,40 @@ jobs:
       - uses: github/codeql-action/analyze@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
         with:
           category: /language:${{ matrix.language }}
+          wait-for-processing: true
+
+  gate:
+    name: Catalog security
+    needs: [changes, python-security, codeql]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      security-events: read
+    steps:
+      - env:
+          CLASSIFIED: ${{ needs.changes.result }}
+          FULL: ${{ needs.changes.outputs.full }}
+          AUDIT: ${{ needs.python-security.result }}
+          CODEQL: ${{ needs.codeql.result }}
+        run: |
+          test "$CLASSIFIED" = success
+          if [ "$FULL" = false ]; then
+            test "$AUDIT" = skipped
+            test "$CODEQL" = skipped
+            echo 'Markdown-only change: security scans are not needed.'
+          else
+            test "$FULL" = true
+            test "$AUDIT" = success
+            test "$CODEQL" = success
+          fi
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: needs.changes.outputs.full == 'true'
+        with:
+          persist-credentials: false
+      - name: Enforce CodeQL severity thresholds for this exact commit
+        if: needs.changes.outputs.full == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/check_security_gate.py
