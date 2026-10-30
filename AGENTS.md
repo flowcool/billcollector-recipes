@@ -45,6 +45,41 @@ actions and dismiss cookie banners first. After two failed probes, ask Florent
 for a screenshot of the page instead of probing further. Throwaway scripts are
 for read-only exploration only, never for a write, a deploy or a production run.
 
+## Recipe intake and done (Florent 2026-10-30)
+
+Never implement a recipe from an unscoped idea. Scope it first.
+
+1. **Request.** Florent names the provider and the need in one sentence.
+2. **Read-only exploration.** One Florent GO per provider covers exploration,
+   qualification and the first production run. Inventory what the portal
+   offers: document families (invoices, statements, notices, tax documents and
+   others), history depth per family, a stable key per family, and portal
+   limits (throttle, 2FA, pagination, date windows).
+3. **Intake card.** Split it in two parts.
+   - Public, in `metadata.yaml` under `scope:`: the families the portal
+     offers, history depth, keys, limits, and per family `implemented` or
+     `documented` with the reason.
+   - Private, in the owning issue: accounts and contracts, Florent's choices,
+     and the Paperless mapping need for Infra. Never commit account data.
+4. **One question to Florent:** the proposed scope. The default implements the
+   needed families plus every family with a low marginal cost (same page, same
+   pattern). Other families stay `documented`: offered, not implemented, with
+   the way to add them. Do not implement before the answer.
+5. **Implementation rule.** Read the complete offered list with a stable key and
+   `incremental: true`. The engine skips known keys over the whole list, so the
+   first run collects the full history and later runs collect only new or late
+   documents. When the portal forces a date window or a page limit, declare
+   that bound in `scope:` and tell Infra: such a recipe needs a periodic
+   control run.
+6. **Done.** Qualification in an isolated lab on the exact engine revision:
+   first run equals the retained inventory, second run collects 0. Record the
+   counts in `validation:`. Each family not covered is a written limit, never an
+   omission. A missing engine capability is an issue for `BillCollector`.
+
+Apply this rule to every new recipe and to Bourse Direct now. Apply it to an
+existing qualified recipe at its next change.
+
+
 ## Project boundaries (Florent 2026-10-30)
 
 Each scope has one owner agent. Work only in the repositories and runtime of
