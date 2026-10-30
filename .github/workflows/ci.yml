@@ -30,6 +30,6 @@ jobs:
           test -f ./export/bc-metadata__free.yaml
       - run: |
           ./scripts/export-playwright-recipes.sh . ./export/playwright \
-            --engine-revision b401f801c9184f6b0c8917fb8d06a79fa0f0e917
+            --engine-revision 45e530b7d6240abb308810183dbe4f65aae5b6dc
           test -f ./export/playwright/recipe-pw__free.yaml
           test -f ./export/playwright/recipe-pw-schema.yaml

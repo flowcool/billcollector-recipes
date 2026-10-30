@@ -20,7 +20,7 @@
       "const": "playwright-daemon"
     },
     "engineRevision": {
-      "const": "b401f801c9184f6b0c8917fb8d06a79fa0f0e917"
+      "const": "45e530b7d6240abb308810183dbe4f65aae5b6dc"
     },
     "status": {
       "enum": [
@@ -91,6 +91,29 @@
         "firstRunPdfReadback": {
           "type": "integer",
           "minimum": 0
+        },
+        "firstRunClicks": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "firstRunDownloadEvents": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "repeatRunClicks": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "repeatRunDownloadEvents": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "keySetsSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "independentSessions": {
+          "const": true
         }
       }
     }
@@ -116,7 +139,13 @@
               "firstRunNew",
               "repeatRunNew",
               "recipeSha256",
-              "firstRunPdfReadback"
+              "firstRunPdfReadback",
+              "firstRunClicks",
+              "firstRunDownloadEvents",
+              "repeatRunClicks",
+              "repeatRunDownloadEvents",
+              "keySetsSha256",
+              "independentSessions"
             ]
           }
         }

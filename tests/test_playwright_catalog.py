@@ -103,6 +103,8 @@ class PlaywrightCatalogTests(unittest.TestCase):
         proof["validation"] = dict(synthetic="tests/unattended_engine_probe.py",
                                    realProvider="two-pass-qualified", date="2026-10-30",
                                    expectedDocuments=2, firstRunNew=2, firstRunPdfReadback=2, repeatRunNew=0,
+                                   firstRunClicks=2, firstRunDownloadEvents=2, repeatRunClicks=0,
+                                   repeatRunDownloadEvents=0, independentSessions=True, keySetsSha256="a"*64,
                                    recipeSha256=hashlib.sha256(recipe.read_bytes()).hexdigest())
         metadata.write_text(yaml.safe_dump(proof))
         self.export()
@@ -111,6 +113,25 @@ class PlaywrightCatalogTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "two-pass proof"):
             self.export()
         self.assertEqual(before, self.snapshot())
+
+    def test_repeat_downloads_and_disabled_incremental_are_not_qualified(self):
+        path = self.source / "playwright/free/metadata.yaml"
+        original = yaml.safe_load(path.read_text())
+        for field in ("repeatRunClicks", "repeatRunDownloadEvents"):
+            proof = yaml.safe_load(path.read_text())
+            proof["validation"][field] = 1
+            path.write_text(yaml.safe_dump(proof))
+            with self.assertRaisesRegex(ValueError, "two-pass proof"):
+                self.export()
+            path.write_text(yaml.safe_dump(original))
+        recipe = path.with_name("recipe-pw__free.yaml")
+        body = yaml.safe_load(recipe.read_text())
+        body["services"][0]["steps"][-1]["methods"][-1]["arguments"][0]["incremental"] = False
+        recipe.write_text(yaml.safe_dump(body))
+        original["validation"]["recipeSha256"] = hashlib.sha256(recipe.read_bytes()).hexdigest()
+        path.write_text(yaml.safe_dump(original))
+        with self.assertRaisesRegex(ValueError, "stable incremental"):
+            self.export()
 
     def test_literal_credentials_are_refused_before_export(self):
         recipe = self.source / "playwright/free/recipe-pw__free.yaml"
@@ -141,6 +162,10 @@ class PlaywrightCatalogTests(unittest.TestCase):
         before = self.snapshot()
         path = self.source / "playwright/free/recipe-pw__free.yaml"
         path.write_text(path.read_text() + "\n# changed release\n")
+        metadata = path.with_name("metadata.yaml")
+        proof = yaml.safe_load(metadata.read_text())
+        proof["validation"]["recipeSha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
+        metadata.write_text(yaml.safe_dump(proof))
         replace = module.os.replace
         count = 0
 

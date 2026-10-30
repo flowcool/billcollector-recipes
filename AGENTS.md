@@ -21,8 +21,8 @@ For a Playwright port or export change, first read
 `docs/plans/playwright-migration.md` and its linked source assessment.
 `playwright/`, `schema/playwright/` and `scripts/export-playwright-recipes.sh`
 implement provider ports with explicit qualification metadata. Read each provider
-status and recorded blocker before use. The deployed qualification baseline is
-`b401f801c9184f6b0c8917fb8d06a79fa0f0e917`.
+status and recorded blocker before use. Read `engineRevision` in the provider
+metadata for the exact qualification baseline; deployment is owned by Infra.
 `tests/engine_probe.py` records the historical single-document snapshot.
 `tests/unattended_engine_probe.py` tests the current unattended collection paths.
 Validate against the exact engine revision that will load a recipe.
@@ -43,3 +43,4 @@ Shared engine contracts remain under `infra-zlth` (project `BillCollector`).
 Read Beads for progress and authorization; Markdown records design and evidence.
 
 Unattended recipe qualification owner: `infra-u4hbm` (project `BillCollector`).
+Incremental collection delivery: `infra-25goi` (project `BillCollector`).

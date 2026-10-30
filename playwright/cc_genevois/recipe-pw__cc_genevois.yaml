@@ -85,4 +85,5 @@ services:
         max_items: 200
         timeout_ms: 600000
         event_window_ms: 10000
+        incremental: true
     step: 9

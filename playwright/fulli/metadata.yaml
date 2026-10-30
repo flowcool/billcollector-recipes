@@ -1,15 +1,24 @@
 service: fulli
 engine: playwright-daemon
-engineRevision: b401f801c9184f6b0c8917fb8d06a79fa0f0e917
-status: experimental
+engineRevision: 45e530b7d6240abb308810183dbe4f65aae5b6dc
+status: qualified
 coverage: all-available-invoices
 limitations:
-- 'Qualification is blocked: the visible pagination control makes no progress after
-  a click.'
-- The currently listed invoices do not prove complete history coverage.
-- Do not deploy until complete two-pass qualification passes.
+- Qualified on one account with all 15 available invoices, including hidden history rows.
+- The stable key is the source billing month and year. Duplicate periods fail closed.
+- Selenium history is not imported. Infra must reconcile prior delivery before production publication.
 validation:
   synthetic: tests/unattended_engine_probe.py
-  realProvider: blocked-pagination
+  realProvider: two-pass-qualified
   date: '2026-10-30'
-  recipeSha256: abe12529f7f390226fb44e1fe2f3ccc87115ddfd22003d36c2a487eb05221854
+  expectedDocuments: 15
+  firstRunNew: 15
+  firstRunPdfReadback: 15
+  repeatRunNew: 0
+  firstRunClicks: 15
+  firstRunDownloadEvents: 15
+  repeatRunClicks: 0
+  repeatRunDownloadEvents: 0
+  keySetsSha256: bb2f8fb4a760339080919e0ffeb80f55abe377db05486e76131157a79bca1043
+  independentSessions: true
+  recipeSha256: 030609c8577d41fe0e2a45b1af696dc1cf61e0148772d8bc95969dd79537f4a5

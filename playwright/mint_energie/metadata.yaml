@@ -1,20 +1,25 @@
 service: mint_energie
 engine: playwright-daemon
-engineRevision: b401f801c9184f6b0c8917fb8d06a79fa0f0e917
-status: experimental
+engineRevision: 45e530b7d6240abb308810183dbe4f65aae5b6dc
+status: qualified
 coverage: all-available-invoices
 limitations:
-- The public PDF link opens inline without a download event.
-- The native all-invoices action returns a ZIP. The two archives differ, while the
-  contained original PDF bytes are identical.
-- The current engine tracks the ZIP and has no qualified extraction path, so direct
-  PDF and zero-new acceptance fail.
+- Qualified on one account with one issued invoice.
+- The native per-contract monthly ZIP must contain exactly one PDF. Its original member bytes are retained.
+- More than one invoice in the same contract month fails closed; that source case is not qualified.
+- Selenium history is not imported. Infra must reconcile prior delivery before production publication.
 validation:
   synthetic: tests/unattended_engine_probe.py
-  realProvider: blocked-zip-packaging
+  realProvider: two-pass-qualified
   date: '2026-10-30'
   expectedDocuments: 1
   firstRunNew: 1
-  repeatRunNew: 1
-  recipeSha256: a2239c8d098d8031f2aed508a48b6b791fdfbd8425a1b788b575ef91a7423212
-  firstRunPdfReadback: 0
+  firstRunPdfReadback: 1
+  repeatRunNew: 0
+  firstRunClicks: 1
+  firstRunDownloadEvents: 1
+  repeatRunClicks: 0
+  repeatRunDownloadEvents: 0
+  keySetsSha256: 30d7dc10d92d024ca3f16580e23d924fe9b4516c48f1bb221b6c7eba8a38bb11
+  independentSessions: true
+  recipeSha256: 1484675df9d46479f76278d5064ce0afd96984db1b636f45ddbbfb0376cb5b8c

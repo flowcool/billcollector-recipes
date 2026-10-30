@@ -343,10 +343,17 @@ Recipes and repository documentation are released under the
 
 ## Unattended Playwright qualification
 
-The runtime baseline is `b401f801c9184f6b0c8917fb8d06a79fa0f0e917`.
+The runtime baseline is `45e530b7d6240abb308810183dbe4f65aae5b6dc`.
 Read each provider metadata before use. `qualified` means complete real-provider
-two-pass proof bound to that recipe SHA256. `experimental` recipes may be
+two-pass proof bound to that recipe SHA256. Both sessions use independent browser
+profiles. The second session skips known source invoice keys: zero clicks,
+zero download events and zero new files. Free, Fulli, Mint Energie and
+CC Genevois pass this check. Octopus Energy has no issued invoices on the
+configured account and remains unqualified. `experimental` recipes may be
 blocked and must not be enabled as unattended production collectors.
 The current source work is tracked by `infra-u4hbm`; Infra owns deployment.
 Synthetic proof: `PLAYWRIGHT_BROWSERS_PATH=/path/to/cache python
 tests/unattended_engine_probe.py /path/to/exact/engine`.
+Install that exact engine's `apps/requirements.txt` and this catalog's
+`requirements-dev.txt` in the isolated test environment first. The historical
+`requirements-engine-tests.txt` belongs to the older single-document probe.
