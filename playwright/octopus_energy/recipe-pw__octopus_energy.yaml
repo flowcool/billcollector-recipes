@@ -7,16 +7,44 @@ services:
     - method: goto
       arguments:
       - url: https://octopusenergy.fr/connexion
-  - step: 2
-    description: Complete login and consent, or confirm the existing session.
+  - description: Reject optional cookies.
+    graceful: true
     methods:
-    - method: wait_user
+    - method: locator
       arguments:
-      - prompt: Complete login and consent in the browser. Select the intended account.
-          Resume only when the account page is ready.
-        until:
-          selector: xpath=//a[contains(@href, '/factures-et-paiements') and not(@data-part)]
-  - step: 3
+      - selector: text=Continuer sans accepter
+    - method: click
+      arguments:
+      - timeout: 3000
+    step: 2
+  - description: Enter the account credential.
+    methods:
+    - method: locator
+      arguments:
+      - selector: '[data-testid="login-email-field"]'
+    - method: fill
+      arguments:
+      - value: '{{USERNAME}}'
+    step: 3
+  - description: Enter the account credential.
+    methods:
+    - method: locator
+      arguments:
+      - selector: '[data-testid="password-field"]'
+    - method: fill
+      arguments:
+      - value: '{{PASSWORD}}'
+    step: 4
+  - description: Submit account login.
+    methods:
+    - method: locator
+      arguments:
+      - selector: '[data-testid="loginButton"]'
+    - method: click
+      arguments:
+      - timeout: 30000
+    step: 5
+  - step: 6
     description: Open the Octopus Energy bills and payments page.
     methods:
     - method: locator
@@ -25,7 +53,7 @@ services:
     - method: click
       arguments:
       - timeout: 30000
-  - step: 4
+  - step: 7
     description: Open the Octopus Energy agreement billing page.
     methods:
     - method: locator
@@ -34,16 +62,11 @@ services:
     - method: click
       arguments:
       - timeout: 30000
-  - step: 5
-    description: Download the payment schedule.
+  - description: Refuse an account without issued invoices.
     methods:
-    - method: expect_download
-    steps:
-    - step: 1
-      methods:
-      - method: locator
-        arguments:
-        - selector: xpath=//button[normalize-space()='Mon échéancier de paiement']
-      - method: click
-        arguments:
-        - timeout: 60000
+    - method: evaluate
+      arguments:
+      - expression: () => { if ([...document.querySelectorAll('td')].some(e => e.textContent.trim() ===
+          'Aucune facture')) throw new Error('No issued invoices are available for qualification'); throw
+          new Error('Invoice download controls require qualification before use'); }
+    step: 8

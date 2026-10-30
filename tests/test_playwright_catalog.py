@@ -1,8 +1,10 @@
+import hashlib
 import importlib.util
 import json
 from pathlib import Path
 import shutil
 import tempfile
+from jsonschema.exceptions import ValidationError
 import unittest
 from unittest.mock import patch
 
@@ -68,7 +70,7 @@ class PlaywrightCatalogTests(unittest.TestCase):
             recipe = yaml.safe_load(original)
             recipe["services"][0]["steps"][0]["methods"][0]["method"] = change
             path.write_text(yaml.safe_dump(recipe))
-            with self.assertRaises(ValueError):
+            with self.assertRaises((ValueError, ValidationError)):
                 self.export()
             self.assertEqual(before, self.snapshot())
         path.write_bytes(original)
@@ -92,6 +94,34 @@ class PlaywrightCatalogTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.export()
         self.assertEqual(before, self.snapshot())
+
+    def test_qualified_proof_is_bound_to_recipe_and_complete_counts(self):
+        recipe = self.source / "playwright/free/recipe-pw__free.yaml"
+        metadata = recipe.with_name("metadata.yaml")
+        proof = yaml.safe_load(metadata.read_text())
+        proof.update(status="qualified", coverage="all-available-invoices")
+        proof["validation"] = dict(synthetic="tests/unattended_engine_probe.py",
+                                   realProvider="two-pass-qualified", date="2026-10-30",
+                                   expectedDocuments=2, firstRunNew=2, firstRunPdfReadback=2, repeatRunNew=0,
+                                   recipeSha256=hashlib.sha256(recipe.read_bytes()).hexdigest())
+        metadata.write_text(yaml.safe_dump(proof))
+        self.export()
+        before = self.snapshot()
+        recipe.write_bytes(recipe.read_bytes() + b"\n# changed recipe\n")
+        with self.assertRaisesRegex(ValueError, "two-pass proof"):
+            self.export()
+        self.assertEqual(before, self.snapshot())
+
+    def test_literal_credentials_are_refused_before_export(self):
+        recipe = self.source / "playwright/free/recipe-pw__free.yaml"
+        body = yaml.safe_load(recipe.read_text())
+        method = next(m for step in body["services"][0]["steps"]
+                      for m in step["methods"] if m["method"] == "fill")
+        method["arguments"] = [{"value": "synthetic-literal-credential"}]
+        recipe.write_text(yaml.safe_dump(body))
+        with self.assertRaisesRegex(ValueError, "placeholders"):
+            self.export()
+        self.assertFalse(self.dest.exists())
 
     def test_stale_owned_file_removed_but_unrelated_file_kept(self):
         self.export()

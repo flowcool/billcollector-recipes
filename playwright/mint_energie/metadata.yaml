@@ -1,20 +1,20 @@
 service: mint_energie
 engine: playwright-daemon
-engineRevision: 501898cade0b9981092db2011fb3fc02812af8b3
+engineRevision: b401f801c9184f6b0c8917fb8d06a79fa0f0e917
 status: experimental
-coverage: first-listed-document
+coverage: all-available-invoices
 limitations:
-- Supervised login and consent are required on every run; no automatic credential
-  submission.
-- Provider selectors, account selection and download events have not been checked
-  on a real account.
-- An empty list fails; a known-content download can succeed without a new publication.
-- Task-scoped SQLite history is not imported from Selenium; keep output disconnected
-  from Paperless.
-- Only the first DOM match is selected; newest order and complete collection are not
-  guaranteed.
-- Uses the public login URL; account-specific activation URLs are not supported. PDF
-  links must emit a current-page download event.
+- The public PDF link opens inline without a download event.
+- The native all-invoices action returns a ZIP. The two archives differ, while the
+  contained original PDF bytes are identical.
+- The current engine tracks the ZIP and has no qualified extraction path, so direct
+  PDF and zero-new acceptance fail.
 validation:
-  synthetic: tests/engine_probe.py
-  realProvider: not-run
+  synthetic: tests/unattended_engine_probe.py
+  realProvider: blocked-zip-packaging
+  date: '2026-10-30'
+  expectedDocuments: 1
+  firstRunNew: 1
+  repeatRunNew: 1
+  recipeSha256: a2239c8d098d8031f2aed508a48b6b791fdfbd8425a1b788b575ef91a7423212
+  firstRunPdfReadback: 0

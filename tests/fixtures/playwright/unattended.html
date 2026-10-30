@@ -1,0 +1,21 @@
+<!doctype html><html><head><meta charset="utf-8"></head><body>
+<input id="login_b"><input id="pass_b"><button id="ok">Login</button>
+<a href="/facture_liste.pl" title="Voir toutes mes factures">History</a>
+<div class="listblock accordion open"><a href="/facture_pdf.pl?id=one" class="btn_download" title="Télécharger votre facture en PDF">One</a></div>
+<div class="listblock accordion closed"><a href="/facture_pdf.pl?id=two" class="btn_download" title="Télécharger votre facture en PDF">Two</a></div>
+<style>.accordion.closed {display:none}</style>
+<button id="onetrust-reject-all-handler">Reject cookies</button>
+<input id="identifier"><button id="otp-submit-btn">Continue</button><input id="password"><button id="pass-submit-btn">Login</button>
+<a class="Button" href="/espace-client/factures">History</a>
+<ul id="js--transactions-list"><li class="data-list__item"><a href="/customer-space/invoice/download/one">One</a></li><li class="data-list__item"><a href="/customer-space/invoice/download/two">Two</a></li></ul>
+<button id="js--transactions-invoices-pager" onclick="loadFulli(this)">More</button>
+<script>function loadFulli(button) { const li = document.createElement('li'); li.className='data-list__item'; const a=document.createElement('a'); a.href='/customer-space/invoice/download/three'; a.textContent='Three'; li.append(a); document.querySelector('#js--transactions-list').append(li); button.remove(); }</script>
+<input id="TB_Login"><input id="TB_Password"><button id="BT_Connexion">Login</button>
+<a id="header1_LB_Exit1" href="/logout">Logout</a>
+<button id="BT_Download" onclick="location.href='/mint-all.pdf'">Download</button>
+<div class="cb__container__button"><button>Cookies</button></div><a href="/public/connexion">Login</a>
+<input id="_email"><input id="_password"><button type="submit">Submit</button>
+<a href="/factures">Factures</a><a href="/factures">Consulter mes factures</a>
+<table><tr><td>date</td><td>synthetic-one</td><td><div class="svg-link__block" title="Télécharger" onclick="ccDownload('/cc-one.pdf')">One</div></td></tr><tr><td>date</td><td>synthetic-two</td><td><div class="svg-link__block" title="Télécharger" onclick="ccDownload('/cc-two.pdf')">Two</div></td></tr></table>
+<script>function ccDownload(url) { location.href=url; setTimeout(() => { const table=document.querySelector('table'); table.innerHTML=table.innerHTML; }, 50); }</script>
+</body></html>

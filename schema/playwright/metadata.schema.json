@@ -20,15 +20,19 @@
       "const": "playwright-daemon"
     },
     "engineRevision": {
-      "const": "501898cade0b9981092db2011fb3fc02812af8b3"
+      "const": "b401f801c9184f6b0c8917fb8d06a79fa0f0e917"
     },
     "status": {
-      "const": "experimental"
+      "enum": [
+        "experimental",
+        "qualified"
+      ]
     },
     "coverage": {
       "enum": [
         "single-payment-schedule",
-        "first-listed-document"
+        "first-listed-document",
+        "all-available-invoices"
       ]
     },
     "limitations": {
@@ -48,12 +52,75 @@
       ],
       "properties": {
         "synthetic": {
-          "const": "tests/engine_probe.py"
+          "enum": [
+            "tests/engine_probe.py",
+            "tests/unattended_engine_probe.py"
+          ]
         },
         "realProvider": {
-          "const": "not-run"
+          "enum": [
+            "not-run",
+            "two-pass-qualified",
+            "blocked-repeat-new-files",
+            "blocked-pagination",
+            "blocked-no-invoices",
+            "blocked-download-transport",
+            "blocked-zip-packaging"
+          ]
+        },
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "expectedDocuments": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "firstRunNew": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "repeatRunNew": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "recipeSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "firstRunPdfReadback": {
+          "type": "integer",
+          "minimum": 0
         }
       }
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "qualified"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "validation": {
+            "required": [
+              "date",
+              "expectedDocuments",
+              "firstRunNew",
+              "repeatRunNew",
+              "recipeSha256",
+              "firstRunPdfReadback"
+            ]
+          }
+        }
+      }
+    }
+  ]
 }

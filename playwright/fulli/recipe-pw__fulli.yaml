@@ -1,45 +1,99 @@
 services:
 - serviceName: fulli
   steps:
-  - step: 1
-    description: Open the public login page.
+  - description: Open the public account page.
     methods:
     - method: goto
       arguments:
       - url: https://www.fulli.com/customer/login
-  - step: 2
-    description: Complete login and consent, or confirm the existing session.
-    methods:
-    - method: wait_user
-      arguments:
-      - prompt: Complete login and consent in the browser. Select the intended account.
-          Resume only when the account page is ready.
-        until:
-          selector: xpath=//a[@href='/espace-client/factures' and contains(concat('
-            ', normalize-space(@class), ' '), ' Button ')]
-  - step: 3
-    description: Open the Fulli invoice history.
+    step: 1
+  - description: Reject optional cookies.
     methods:
     - method: locator
       arguments:
-      - selector: xpath=//a[@href='/espace-client/factures' and contains(concat('
-          ', normalize-space(@class), ' '), ' Button ')]
+      - selector: '#onetrust-reject-all-handler'
+    - method: click
+      arguments:
+      - timeout: 3000
+    graceful: true
+    step: 2
+  - description: Enter the account credential.
+    methods:
+    - method: locator
+      arguments:
+      - selector: '#identifier'
+    - method: fill
+      arguments:
+      - value: '{{USERNAME}}'
+    step: 3
+  - description: Continue to the password form.
+    methods:
+    - method: locator
+      arguments:
+      - selector: '#otp-submit-btn'
     - method: click
       arguments:
       - timeout: 30000
-  - step: 4
-    description: Download only the first listed document. Order is not verified.
+    step: 4
+  - description: Enter the account credential.
     methods:
-    - method: expect_download
-    steps:
-    - step: 1
-      methods:
-      - method: locator
-        arguments:
-        - selector: xpath=//ul[@id='js--transactions-list']/li[contains(concat(' ',
-            normalize-space(@class), ' '), ' data-list__item ')]//a[starts-with(@href,
-            '/customer-space/invoice/download/')]
-      - method: first
-      - method: click
-        arguments:
-        - timeout: 60000
+    - method: locator
+      arguments:
+      - selector: '#password'
+    - method: fill
+      arguments:
+      - value: '{{PASSWORD}}'
+    step: 5
+  - description: Submit account login.
+    methods:
+    - method: locator
+      arguments:
+      - selector: '#pass-submit-btn'
+    - method: click
+      arguments:
+      - timeout: 30000
+    step: 6
+  - description: Reject optional cookies.
+    methods:
+    - method: locator
+      arguments:
+      - selector: '#onetrust-reject-all-handler'
+    - method: click
+      arguments:
+      - timeout: 3000
+    graceful: true
+    step: 7
+  - description: Open invoice history.
+    methods:
+    - method: locator
+      arguments:
+      - selector: a.Button[href='/espace-client/factures']
+    - method: click
+      arguments:
+      - timeout: 30000
+    step: 8
+  - description: Load every invoice history page.
+    methods:
+    - method: locator
+      arguments:
+      - selector: '#js--transactions-invoices-pager:not(.visually-hidden)'
+    - method: click_until_absent
+      arguments:
+      - progress_selector: xpath=//ul[@id='js--transactions-list']/li[contains(concat(' ', normalize-space(@class),
+          ' '), ' data-list__item ')]//a[starts-with(@href, '/customer-space/invoice/download/')]
+        max_clicks: 20
+        timeout_ms: 120000
+    step: 9
+  - description: Download every listed invoice PDF.
+    methods:
+    - method: locator
+      arguments:
+      - selector: xpath=//ul[@id='js--transactions-list']/li[contains(concat(' ', normalize-space(@class),
+          ' '), ' data-list__item ')]//a[starts-with(@href, '/customer-space/invoice/download/')]
+    - method: download_all
+      arguments:
+      - key_attribute: href
+        max_items: 200
+        timeout_ms: 600000
+        event_window_ms: 10000
+    step: 10
