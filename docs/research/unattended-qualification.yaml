@@ -1,0 +1,102 @@
+date: '2026-10-30'
+engine_revision: b401f801c9184f6b0c8917fb8d06a79fa0f0e917
+source_issue: infra-u4hbm
+production_changed: false
+providers:
+  free:
+    status: experimental
+    coverage: all-available-invoices
+    limitations:
+    - Qualification covers one configured Freebox account.
+    - 'The portal regenerates PDF bytes: both successful passes published 19 files.
+      Hash-only engine deduplication does not meet zero-new acceptance.'
+    - Keep output disconnected from Paperless until repeat identity is resolved.
+    validation:
+      synthetic: tests/unattended_engine_probe.py
+      realProvider: blocked-repeat-new-files
+      date: '2026-10-30'
+      expectedDocuments: 19
+      firstRunNew: 19
+      repeatRunNew: 19
+      recipeSha256: 82c88f6d93cecbe8cf2539f9d2363f68264de70cce9d8d4ea645e8a0d924ebab
+      firstRunPdfReadback: 19
+  fulli:
+    status: experimental
+    coverage: all-available-invoices
+    limitations:
+    - 'Qualification is blocked: the visible pagination control makes no progress
+      after a click.'
+    - The currently listed invoices do not prove complete history coverage.
+    - Do not deploy until complete two-pass qualification passes.
+    validation:
+      synthetic: tests/unattended_engine_probe.py
+      realProvider: blocked-pagination
+      date: '2026-10-30'
+      recipeSha256: abe12529f7f390226fb44e1fe2f3ccc87115ddfd22003d36c2a487eb05221854
+  mint_energie:
+    status: experimental
+    coverage: all-available-invoices
+    limitations:
+    - The public PDF link opens inline without a download event.
+    - The native all-invoices action returns a ZIP. The two archives differ, while
+      the contained original PDF bytes are identical.
+    - The current engine tracks the ZIP and has no qualified extraction path, so direct
+      PDF and zero-new acceptance fail.
+    validation:
+      synthetic: tests/unattended_engine_probe.py
+      realProvider: blocked-zip-packaging
+      date: '2026-10-30'
+      expectedDocuments: 1
+      firstRunNew: 1
+      repeatRunNew: 1
+      recipeSha256: a2239c8d098d8031f2aed508a48b6b791fdfbd8425a1b788b575ef91a7423212
+      firstRunPdfReadback: 0
+  octopus_energy:
+    status: experimental
+    coverage: all-available-invoices
+    limitations:
+    - The configured account explicitly has no issued invoices.
+    - The preparation recipe stops after authentication and invoice navigation; download
+      controls remain unqualified.
+    - Payment schedules are excluded from issued-invoice acceptance.
+    validation:
+      synthetic: tests/unattended_engine_probe.py
+      realProvider: blocked-no-invoices
+      date: '2026-10-30'
+      recipeSha256: 25f93828e284a28b9348545a5e17cc940fe19d8a626b84eb82fc02f082800787
+  cc_genevois:
+    status: qualified
+    coverage: all-available-invoices
+    limitations:
+    - Qualified on one configured contract with five issued invoices.
+    - The portal rerenders invoice controls after download; keys are rebound from
+      source invoice numbers.
+    - Selenium history is not imported; Infra must reconcile prior delivery before
+      production publication.
+    validation:
+      synthetic: tests/unattended_engine_probe.py
+      realProvider: two-pass-qualified
+      date: '2026-10-30'
+      expectedDocuments: 5
+      firstRunNew: 5
+      firstRunPdfReadback: 5
+      repeatRunNew: 0
+      recipeSha256: 54ccc6aeae92b766c802582d0bf982559756a71dd4a743abe5a0f026b06bbaed
+validation:
+  unit_tests: 13
+  synthetic:
+    external_requests: 0
+    providers:
+      free:
+        first_new: 2
+        repeat_new: 0
+      fulli:
+        first_new: 3
+        repeat_new: 0
+      mint_energie:
+        first_new: 1
+        repeat_new: 0
+      cc_genevois:
+        first_new: 2
+        repeat_new: 0
+        rerender_after_each_download: true

@@ -1,5 +1,6 @@
 """Validate the catalog and export only managed Playwright runtime files."""
 import argparse
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -8,7 +9,7 @@ import tempfile
 import yaml
 from jsonschema import validate
 
-REVISION = "501898cade0b9981092db2011fb3fc02812af8b3"
+REVISION = "b401f801c9184f6b0c8917fb8d06a79fa0f0e917"
 MANIFEST = ".billcollector-playwright.json"
 SCHEMA = "recipe-pw-schema.yaml"
 
@@ -29,15 +30,32 @@ def check_steps(steps, nested=False):
         elif names == ["goto"] and not nested:
             if not methods[0].get("arguments", [{}])[0].get("url", "").startswith("https://"):
                 raise ValueError("Navigation must use a public HTTPS URL")
-        elif names in (["locator", "click"], ["locator", "first", "click"]):
+        elif names in (["locator", "click"], ["locator", "first", "click"],
+                       ["locator", "fill"], ["locator", "download_all"],
+                       ["locator", "click_until_absent"]):
             if not methods[0].get("arguments", [{}])[0].get("selector"):
                 raise ValueError("Missing selector")
-            timeout = methods[-1].get("arguments", [{}])[0].get("timeout")
-            if not isinstance(timeout, int) or not 0 < timeout <= 60000:
-                raise ValueError("Click must have a finite timeout")
+            options = {k: v for arg in methods[-1].get("arguments", []) for k, v in arg.items()}
+            if names[-1] == "click":
+                timeout = options.get("timeout")
+                if not isinstance(timeout, int) or not 0 < timeout <= 60000:
+                    raise ValueError("Click must have a finite timeout")
+            elif names[-1] == "fill":
+                if options.get("value") not in {"{{USERNAME}}", "{{PASSWORD}}"}:
+                    raise ValueError("Credentials must use engine placeholders")
+        elif names == ["login"] and not nested:
+            options = {k: v for arg in methods[0].get("arguments", []) for k, v in arg.items()}
+            if not options.get("success", {}).get("selector"):
+                raise ValueError("Login requires an authenticated success selector")
+            check_steps(step.get("steps", []), nested=True)
+            check_steps([step["submit"]], nested=True)
+        elif names == ["evaluate"] and not nested:
+            expression = methods[0].get("arguments", [{}])[0].get("expression")
+            if not isinstance(expression, str) or not expression.strip():
+                raise ValueError("DOM evaluation requires an expression")
         else:
             raise ValueError(f"Unsupported method chain: {names}")
-        if "steps" in step and names != ["expect_download"]:
+        if "steps" in step and names not in (["expect_download"], ["login"]):
             raise ValueError("Unexpected nested steps")
 
 
@@ -68,10 +86,26 @@ def catalog(source):
             raise ValueError("Recipe service differs from metadata")
         steps = recipe["services"][0]["steps"]
         check_steps(steps)
-        if sum(s["methods"][0]["method"] == "expect_download" for s in steps) != 1:
-            raise ValueError("Current coverage requires one tracked download")
-        if [s["methods"][0]["method"] for s in steps[:2]] != ["goto", "wait_user"]:
-            raise ValueError("Expected supervised authentication")
+        downloads = [s for s in steps if s["methods"][-1]["method"] in
+                     {"expect_download", "download_all"}]
+        if not downloads and metadata["validation"]["realProvider"] != "blocked-no-invoices":
+            raise ValueError("At least one tracked download is required")
+        if steps[0]["methods"][0]["method"] != "goto":
+            raise ValueError("Expected public HTTPS entry point")
+        if metadata["status"] == "qualified":
+            proof = metadata["validation"]
+            expected_count = proof.get("expectedDocuments")
+            if (not isinstance(expected_count, int) or isinstance(expected_count, bool) or expected_count < 1
+                    or not proof.get("date")
+                    or metadata["coverage"] != "all-available-invoices"
+                    or proof["realProvider"] != "two-pass-qualified"
+                    or proof.get("firstRunNew") != expected_count
+                    or proof.get("firstRunPdfReadback") != expected_count
+                    or proof.get("repeatRunNew") != 0
+                    or proof.get("recipeSha256") != hashlib.sha256(data).hexdigest()):
+                raise ValueError("Qualified metadata must bind complete two-pass proof to this recipe")
+            if any(s["methods"][0]["method"] == "wait_user" for s in steps):
+                raise ValueError("Qualified unattended recipes cannot wait for an operator")
         if expected.name in files:
             raise ValueError("Duplicate export filename")
         files[expected.name] = data

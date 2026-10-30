@@ -1,20 +1,20 @@
 service: cc_genevois
 engine: playwright-daemon
-engineRevision: 501898cade0b9981092db2011fb3fc02812af8b3
-status: experimental
-coverage: first-listed-document
+engineRevision: b401f801c9184f6b0c8917fb8d06a79fa0f0e917
+status: qualified
+coverage: all-available-invoices
 limitations:
-- Supervised login and consent are required on every run; no automatic credential
-  submission.
-- Provider selectors, account selection and download events have not been checked
-  on a real account.
-- An empty list fails; a known-content download can succeed without a new publication.
-- Task-scoped SQLite history is not imported from Selenium; keep output disconnected
-  from Paperless.
-- Only the first DOM match is selected; newest order and complete collection are not
-  guaranteed.
-- The selected download control must emit exactly one current-page download event;
-  popups are not covered.
+- Qualified on one configured contract with five issued invoices.
+- The portal rerenders invoice controls after download; keys are rebound from source
+  invoice numbers.
+- Selenium history is not imported; Infra must reconcile prior delivery before production
+  publication.
 validation:
-  synthetic: tests/engine_probe.py
-  realProvider: not-run
+  synthetic: tests/unattended_engine_probe.py
+  realProvider: two-pass-qualified
+  date: '2026-10-30'
+  expectedDocuments: 5
+  firstRunNew: 5
+  firstRunPdfReadback: 5
+  repeatRunNew: 0
+  recipeSha256: 54ccc6aeae92b766c802582d0bf982559756a71dd4a743abe5a0f026b06bbaed

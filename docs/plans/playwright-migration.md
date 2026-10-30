@@ -1,105 +1,57 @@
-# Migrate the recipe catalog to Playwright
+# Migrate five providers to unattended Playwright
 
-Scope approved by Florent on 2026-10-21: implement every useful path supported
-by the selected engine. Keep Selenium. Test with synthetic data only.
-Real accounts and Paperless cutover require a validated operation plan.
+Florent approved unattended migration of Free, Fulli, Mint Energie, Octopus
+Energy and CC Genevois on 2026-10-30. Use the existing Selenium selectors as the
+starting point. Preserve the Selenium catalog. Its deployed scheduler remains
+available until Infra completes each provider cutover.
 
-## Mechanism and baselines
+## Mechanism
 
-The runtime consumes `services[].steps[].methods[]`. It tracks one browser
-Download per `expect_download` step. It does not provide collection or pagination.
-Use the unchanged upstream schema at `c539b3420d0495ee6c4133e88e3a74e6e98740ad`.
-Validate runtime behavior against fork `501898cade0b9981092db2011fb3fc02812af8b3`.
-The [source assessment](../research/upstream-playwright-contract.md) records
-source links and the differences between these baselines.
+The exact qualification baseline is fork revision
+`b401f801c9184f6b0c8917fb8d06a79fa0f0e917`. Its schema is vendored unchanged.
+Recipes use engine credential placeholders, native Playwright navigation,
+optional cookie dismissal and bounded `download_all`. Fulli also uses
+`click_until_absent` with invoice rows as its progress check. Free expands all
+invoice-year panels before collecting the links. No recipe stores credentials,
+account identifiers or authenticated download URLs.
 
-The fork stages files and suppresses known content before publication.
-It publishes before SQLite insertion. Reproduce interruption at this boundary.
-Check existing upstream issues. Open one focused issue with synthetic evidence.
-Do not claim crash recovery is safe until the engine fixes and tests this case.
+## Acceptance
 
-## Ports available now
+For each provider, use a fresh private database, browser profile and download
+root. Disable consumers. Read credentials directly into memory from the existing
+vault item. Run the exact recipe twice with the actual engine. The first run
+must succeed and download every available invoice. Verify each new file has a
+PDF signature. The second run must succeed with zero new publications. Retain
+private originals and browser evidence outside Git. Record aggregate counts,
+recipe SHA256 and exact engine revision in metadata and the owning issue.
+Octopus must collect issued invoices; a payment schedule is insufficient.
 
-All ports are experimental. Synthetic proof validates recipe execution against
-constructed pages. It does not validate current provider pages or credentials.
+A failed provider remains unqualified. Record its exact blocker and continue
+independent providers. Do not deploy, alter the live database or recipe mount,
+write to staging or Paperless consume, or disable Selenium during qualification.
+Production delivery and scheduling remain Infra responsibilities.
 
-| Provider | Available scope | Explicit limit |
-|---|---|---|
-| Octopus Energy | Bills page, agreement page, one payment schedule | No issued invoice flow. Multiple agreements require operator selection. |
-| Free | History page, first matching PDF control | One DOM match. No newest-order guarantee or complete collection. |
-| Mint Energie | Public login page, invoice page, first matching PDF link | No private activation URL. A link must emit a current-page download event. |
-| CC Genevois | Invoice list, first matching download control | One current-page download. No popup or complete collection proof. |
-| Fulli | Invoice list, first matching download link | Initial visible list only. No load-more. Captcha requires operator action. |
+## Catalog and publication
 
-Use `wait_user` for supervised login, consent and account selection. Guard resume
-with a visible account-page selector. Do not automate credential submission with
-the current three-attempt runner. Profile reuse does not skip this pause.
-These are supervised ports. Unattended authentication remains separate engine work.
+`playwright/<provider>/` contains the recipe and separate metadata. The catalog
+exporter validates every recipe and its metadata before writing. Qualified
+metadata must match the actual recipe hash and two-pass counts. A stale proof or
+human-login pause cannot qualify an unattended recipe.
 
-Historical invoices were already collected with Selenium. Complete historical
-collection is not a prerequisite for these ports. First-listed selection must
-never be described as latest, complete, or sufficient for unattended catch-up.
-Selenium remains available where wider coverage is required.
+Run `python -m unittest discover -s tests -v` and the isolated browser probe.
+Keep the existing Selenium export checks. Export Playwright only into a
+disposable directory with `scripts/export-playwright-recipes.sh SOURCE DEST
+--engine-revision b401f801c9184f6b0c8917fb8d06a79fa0f0e917`. The exporter retains
+its ownership manifest, mixed-directory refusal and caught-error rollback.
+Never use it directly against the live daemon recipe directory.
 
-## Catalog and export
+Publish one reviewed recipe PR and a versioned release. Infra pins that release
+under `infra-1lr1.4` through `.8`. The source qualification owner is
+`infra-u4hbm`. The older single-document synthetic report describes its original
+snapshot and is historical evidence.
 
-Keep `recipes/`, `schema/recipe.schema.json` and `scripts/export-recipes.sh`.
-Add `playwright/<provider>/recipe-pw__<service>.yaml` with separate metadata.
-Copy the exact upstream schema and its MIT notice under `schema/playwright/`.
-Metadata records revision, coverage, limitations and separate validation evidence.
-Do not export metadata into the runtime recipe body.
+## Recovery
 
-Use `scripts/export-playwright-recipes.sh SOURCE DEST --engine-revision SHA`.
-Validate the full source before writing. Refuse mixed Selenium destinations,
-unmanaged Playwright recipes, symlinks and a conflicting runtime schema.
-Use an ownership manifest to replace only the owned set. Preserve unrelated files.
-Restore the prior set after caught write errors. A process death during export
-can leave a partial release: discard it and export again into a fresh directory.
-This exporter targets a disposable release directory, never a live mutable daemon.
-
-## Isolated acceptance
-
-1. Existing Selenium tests and export still pass.
-2. Validate five recipe/metadata pairs and supported method chains.
-3. Test export refusal, invalid sources, repeat export, stale owned files,
-   unrelated files, and restoration after an injected write failure.
-4. Archive the exact engine revision into a temporary directory. Override every
-   mutable runtime path. Use a temporary SQLite database, profile and output.
-   Never import engine helpers from the operational checkout.
-5. Execute the actual engine step dispatch and download handler with Chromium.
-   Route every browser request to synthetic responses. Reject other traffic.
-   Simulate operator resume only in this fixture. Do not contact a vault.
-6. For every recipe, prove one tracked file from a multi-item fixture where
-   applicable. Repeat with stable task identity and prove no new publication.
-   Test empty lists and download failure separately. Assert engine result status.
-7. Reproduce process death after publication and before SQLite insertion.
-   Restart against the same temporary SQLite database. Record files, hashes,
-   tracking rows and consumer calls. Publish only sanitized evidence upstream.
-
-Completion proof is the local commit plus the commands and counts in the
-[isolated validation report](../research/playwright-isolated-validation.md).
-Rollback is `git revert <catalog-commit>` and disposal of isolated test output.
-No provider schedule, credentials or production state changes in this phase.
-
-## Work that remains separate
-
-The collection prototype remains our work under `infra-zlth.65` and fork PR #41.
-Continue its development and review in the engine project. Maintainer agreement
-for upstream contribution does not gate independent catalog ports. Once a target
-engine includes the proven contract, extend each recipe and its fixtures with
-bounded complete collection. Fulli also needs progress-aware pagination.
-
-Shared engine contracts remain under `infra-zlth`. Catalog work belongs to
-`infra-spee`. Real-account verification and cutover belong to `infra-1lr1`.
-Use quarantine output disconnected from Paperless during approved real tests.
-Reconcile historical content and stable task identity before enabling publication.
-Existing Selenium history does not automatically populate Playwright SQLite.
-Keep reverse continuity and a single active scheduler in the cutover plan.
-
-## Evidence that changes the plan
-
-- New engine source: repeat exact-revision contract checks.
-- Proven collection or pagination: remove only the corresponding coverage limit.
-- Changed portal selectors or download transport: revise that provider only.
-- Proven safe unattended login: replace the supervised pause with that contract.
-- Proven interrupted-publication recovery: repeat crash tests before cutover.
+Revert the scoped recipe release commit. Retain private proof and originals.
+An Infra rollout uses its own versioned operation plan and rollback; this
+catalog change does not perform that rollout.

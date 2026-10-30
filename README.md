@@ -310,8 +310,10 @@ python3 -m unittest discover -s tests -v
 ```
 
 Selectors should be as stable and specific as possible. Prefer semantic IDs or
-attributes over page position. A recipe must not execute arbitrary JavaScript;
-engine actions belong in BillCollector itself.
+attributes over page position. For the legacy Selenium catalog, engine actions belong in BillCollector.
+Playwright recipes may use reviewed DOM-only evaluation to expose existing
+invoice rows or bind controls to their source invoice number. Never embed
+credentials, private identifiers, network calls or document transformations.
 
 ## Release policy
 
@@ -338,3 +340,13 @@ than opening a public issue containing the data.
 
 Recipes and repository documentation are released under the
 [MIT License](LICENSE).
+
+## Unattended Playwright qualification
+
+The runtime baseline is `b401f801c9184f6b0c8917fb8d06a79fa0f0e917`.
+Read each provider metadata before use. `qualified` means complete real-provider
+two-pass proof bound to that recipe SHA256. `experimental` recipes may be
+blocked and must not be enabled as unattended production collectors.
+The current source work is tracked by `infra-u4hbm`; Infra owns deployment.
+Synthetic proof: `PLAYWRIGHT_BROWSERS_PATH=/path/to/cache python
+tests/unattended_engine_probe.py /path/to/exact/engine`.

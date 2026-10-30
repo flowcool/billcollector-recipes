@@ -44,18 +44,275 @@ definitions:
       steps:
         type: array
         items:
-          $ref: "#/definitions/step"
-  method:
+          $ref: "#/definitions/nestedStep"
+      phases:
+        type: array
+        minItems: 1
+        items:
+          type: object
+          required: [submit, success]
+          additionalProperties: false
+          properties:
+            success:
+              type: object
+            steps:
+              type: array
+              items:
+                $ref: "#/definitions/step"
+            submit:
+              $ref: "#/definitions/step"
+      submit:
+        $ref: "#/definitions/step"
+    allOf:
+      - if:
+          required: [ methods ]
+          properties:
+            methods:
+              contains:
+                type: object
+                properties:
+                  method:
+                    enum: [ "click_until_absent", "download_all", "replacement_calendar" ]
+                required: [ method ]
+        then:
+          properties:
+            graceful:
+              const: false
+            methods:
+              type: array
+              minItems: 2
+              maxItems: 2
+              items:
+                - $ref: "#/definitions/collectionLocatorMethod"
+                - $ref: "#/definitions/collectionActionMethod"
+              additionalItems: false
+          not:
+            required: [ steps ]
+  nestedStep:
     type: object
-    required:
-      - method
+    required: [ step ]
+    properties:
+      step:
+        type: integer
+      description:
+        type: string
+      graceful:
+        type: boolean
+      methods:
+        type: array
+        items:
+          $ref: "#/definitions/method"
+      steps:
+        type: array
+        items:
+          $ref: "#/definitions/nestedStep"
+    allOf:
+      - not:
+          required: [ methods ]
+          properties:
+            methods:
+              contains:
+                type: object
+                required: [ method ]
+                properties:
+                  method:
+                    enum: [ "click_until_absent", "download_all", "replacement_calendar" ]
+  method:
+    oneOf:
+      - $ref: "#/definitions/playwrightMethod"
+      - $ref: "#/definitions/clickUntilAbsentMethod"
+      - $ref: "#/definitions/downloadAllMethod"
+      - $ref: "#/definitions/replacementCalendarMethod"
+  collectionLocatorMethod:
+    type: object
+    required: [ method ]
+    additionalProperties: false
     properties:
       method:
-        type: string
+        enum:
+          - locator
+          - get_by_role
+          - get_by_label
+          - get_by_text
+          - get_by_title
+          - get_by_placeholder
+          - get_by_test_id
       arguments:
         type: array
         items:
           type: object
           additionalProperties:
             type: [ "string", "boolean", "number", "object", "null" ]
+  collectionActionMethod:
+    oneOf:
+      - $ref: "#/definitions/clickUntilAbsentMethod"
+      - $ref: "#/definitions/downloadAllMethod"
+      - $ref: "#/definitions/replacementCalendarMethod"
+  playwrightMethod:
+    type: object
+    required:
+      - method
+    properties:
+      method:
+        type: string
+        not:
+          enum: [ "click_until_absent", "download_all", "replacement_calendar" ]
+      arguments:
+        oneOf:
+          - type: array
+            items:
+              type: object
+              additionalProperties:
+                type: [ "string", "boolean", "number", "object", "null" ]
+          - type: array
+            minItems: 1
+            maxItems: 1
+            items:
+              const: "Enter"
+    allOf:
+      - if:
+          required: [ arguments ]
+          properties:
+            arguments:
+              contains:
+                const: "Enter"
+        then:
+          properties:
+            method:
+              const: "press"
+  clickUntilAbsentMethod:
+    type: object
+    required: [ method, arguments ]
+    additionalProperties: false
+    properties:
+      method:
+        const: "click_until_absent"
+      arguments:
+        type: array
+        minItems: 1
+        maxItems: 1
+        items:
+          type: object
+          required: [ progress_selector, max_clicks, timeout_ms ]
+          additionalProperties: false
+          properties:
+            progress_selector:
+              type: string
+              minLength: 1
+              pattern: ".*\\S.*"
+            max_clicks:
+              type: integer
+              minimum: 1
+              maximum: 100
+            timeout_ms:
+              type: integer
+              minimum: 1
+              maximum: 120000
+  downloadAllMethod:
+    type: object
+    required: [ method, arguments ]
+    additionalProperties: false
+    properties:
+      method:
+        const: "download_all"
+      arguments:
+        type: array
+        minItems: 1
+        maxItems: 1
+        items:
+          type: object
+          required: [ key_attribute, max_items, timeout_ms, event_window_ms ]
+          additionalProperties: false
+          properties:
+            key_attribute:
+              type: string
+              minLength: 1
+              pattern: ".*\\S.*"
+            max_items:
+              type: integer
+              minimum: 1
+              maximum: 200
+            timeout_ms:
+              type: integer
+              minimum: 1
+              maximum: 600000
+            event_window_ms:
+              type: integer
+              minimum: 1
+              maximum: 10000
+  replacementCalendarMethod:
+    type: object
+    required:
+    - method
+    - arguments
+    additionalProperties: false
+    properties:
+      method:
+        const: replacement_calendar
+      arguments:
+        type: array
+        minItems: 1
+        maxItems: 1
+        items:
+          type: object
+          required:
+          - account_id
+          - account_selector
+          - year_selector
+          - month_selector
+          - previous_selector
+          - item_selector
+          - empty_selector
+          - ready_selector
+          - max_months
+          - download_options
+          additionalProperties: false
+          properties:
+            account_id:
+              type: string
+              minLength: 1
+              pattern: .*\S.*
+            account_selector:
+              type: string
+              minLength: 1
+              pattern: .*\S.*
+            year_selector:
+              type: string
+              minLength: 1
+              pattern: .*\S.*
+            month_selector:
+              type: string
+              minLength: 1
+              pattern: .*\S.*
+            previous_selector:
+              type: string
+              minLength: 1
+              pattern: .*\S.*
+            item_selector:
+              type: string
+              minLength: 1
+              pattern: .*\S.*
+            empty_selector:
+              type: string
+              minLength: 1
+              pattern: .*\S.*
+            ready_selector:
+              type: string
+              minLength: 1
+              pattern: .*\S.*
+            max_months:
+              type: integer
+              minimum: 1
+              maximum: 120
+            download_options:
+              $ref: '#/definitions/downloadAllMethod/properties/arguments/items'
+            month_names:
+              type: array
+              minItems: 12
+              maxItems: 12
+              uniqueItems: true
+              items:
+                type: string
+                minLength: 1
+
 additionalProperties: false
