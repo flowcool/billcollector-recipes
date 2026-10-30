@@ -1,0 +1,19 @@
+service: bourse_direct
+engine: playwright-daemon
+engineRevision: c87f980b985d526dac95760e477cec95f280896d
+status: experimental
+coverage: offered-operation-notices
+limitations:
+- Download All covers up to 13 offered calendar months, including the current month. Incremental preserves the task
+  date_window_days (default 90); both retain revision checks.
+- An explicit date-from override wins. Calendar reset to the current month fails closed. No all-history replay is
+  forced on incremental runs.
+- Only operation notices for one PEA account; PEA-PME has synthetic coverage only. Annual statements and tax documents
+  are outside this recipe.
+- Synthetic exact-engine qualification only for this changed recipe. Earlier real-source proof covered October 2026
+  on an older artifact, not 13 live months.
+- Requires the native Bourse Direct engine adapter and separately configured vault, delivery, login/document request
+  gates. Deployment belongs to Infra.
+validation:
+  synthetic: tests/bourse_direct_engine_probe.py
+  realProvider: not-run

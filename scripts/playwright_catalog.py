@@ -9,7 +9,7 @@ import tempfile
 import yaml
 from jsonschema import validate
 
-REVISION = "45e530b7d6240abb308810183dbe4f65aae5b6dc"
+REVISION = "c87f980b985d526dac95760e477cec95f280896d"
 MANIFEST = ".billcollector-playwright.json"
 SCHEMA = "recipe-pw-schema.yaml"
 
@@ -32,11 +32,18 @@ def check_steps(steps, nested=False):
                 raise ValueError("Navigation must use a public HTTPS URL")
         elif names in (["locator", "click"], ["locator", "first", "click"],
                        ["locator", "fill"], ["locator", "download_all"],
-                       ["locator", "click_until_absent"]):
+                       ["locator", "click_until_absent"], ["locator", "bourse_direct"]):
             if not methods[0].get("arguments", [{}])[0].get("selector"):
                 raise ValueError("Missing selector")
             options = {k: v for arg in methods[-1].get("arguments", []) for k, v in arg.items()}
-            if names[-1] == "click":
+            if names[-1] == "bourse_direct":
+                if (options.get("account_type") not in {"PEA", "PEA-PME"}
+                        or options.get("incremental") is not True
+                        or type(options.get("max_months")) is not int or not 1 <= options["max_months"] <= 13
+                        or type(options.get("max_items")) is not int or not 100 <= options["max_items"] <= 200
+                        or type(options.get("timeout_ms")) is not int or not 1 <= options["timeout_ms"] <= 7_200_000):
+                    raise ValueError("Invalid Bourse Direct history or request bounds")
+            elif names[-1] == "click":
                 timeout = options.get("timeout")
                 if not isinstance(timeout, int) or not 0 < timeout <= 60000:
                     raise ValueError("Click must have a finite timeout")
@@ -87,7 +94,7 @@ def catalog(source):
         steps = recipe["services"][0]["steps"]
         check_steps(steps)
         downloads = [s for s in steps if s["methods"][-1]["method"] in
-                     {"expect_download", "download_all"}]
+                     {"expect_download", "download_all", "bourse_direct"}]
         if not downloads and metadata["validation"]["realProvider"] != "blocked-no-invoices":
             raise ValueError("At least one tracked download is required")
         if steps[0]["methods"][0]["method"] != "goto":

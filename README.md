@@ -357,3 +357,11 @@ tests/unattended_engine_probe.py /path/to/exact/engine`.
 Install that exact engine's `apps/requirements.txt` and this catalog's
 `requirements-dev.txt` in the isolated test environment first. The historical
 `requirements-engine-tests.txt` belongs to the older single-document probe.
+
+## Bourse Direct history candidate
+
+The catalog now owns the [Bourse Direct operation-notice recipe](docs/bourse-direct.md).
+It is experimental: up to 13 months for GetAll, the task window for incremental.
+Use engine `c87f980b985d526dac95760e477cec95f280896d` and its packaged schema. The six-recipe
+export keeps historical provider proof distinct from this synthetic candidate.
+No new real provider qualification or deployment is claimed.
