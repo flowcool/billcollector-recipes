@@ -1,5 +1,8 @@
 # Upstream Playwright contract
 
+> Historical snapshot. Its baseline and limits apply only to that artifact.
+> For the active catalog, read ../../README.md and ../plans/playwright-migration.md.
+
 Research date: 2026-10-21. Public upstream baseline: `s-t-e-f-a-n/BillCollector` at `c539b3420d0495ee6c4133e88e3a74e6e98740ad`. Comparison baseline: `flowcool/BillCollector` at `501898cade0b9981092db2011fb3fc02812af8b3` (the selected deployment source). These are source observations, not a live deployment audit.
 
 ## Recommendation

@@ -1,6 +1,6 @@
 # Bourse Direct operation notices
 
-Owner: `infra-5iqmw`; engine request pacing: `infra-36zv1`.
+Catalog owner: `infra-22l0n`; delivered history: `infra-5iqmw`; engine pacing: `infra-36zv1`.
 Install the catalog recipe at `/apps/recipes_playwright/recipe-pw__bourse_direct.yaml`
 and use an explicit recipe_file for the existing task. Keep its service/user
 identity, DB path, profile, journal and archive policy. Do not create a new task
@@ -36,3 +36,20 @@ Export into an unused release directory, never the live recipe mount. Infra
 owns image/schema/recipe pins, rollout and original-byte archive readback under
 its operation plan. Revert the catalog release for source rollback; deployment
 recovery must retain DB, journal, profiles and originals.
+
+## Approved intake
+
+Florent approved operation notices only on 2026-10-30, without a new portal
+connection for this P1. The structured intake lives in `metadata.yaml` under
+`scope`. The retained PEA proof covers five October 2026 notices, then zero new
+files, on an older artifact. The current recipe remains experimental. PEA-PME
+has synthetic coverage only. Statements, IFU and other families are unverified
+extensions: their presence, keys and history need a later inventory and decision.
+The retained 2025-10 calendar boundary is an October 2026 observation. It is not
+a fresh measurement or proof of 13 live months.
+
+Notice identity uses nc, type, year, month and day within the existing selected
+account task. Runtime revisions remain distinct. GetAll and incremental have
+different bounds. A periodic full-window control run is required to detect late
+or changed notices outside the recent incremental window. Infra owns its cadence
+and alerts under `infra-1lr1.3`; this catalog does not change a schedule.

@@ -121,6 +121,93 @@
           "const": true
         }
       }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "families",
+        "history",
+        "stableKey",
+        "limits",
+        "evidence"
+      ],
+      "properties": {
+        "families": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "operation_notices",
+            "statements",
+            "tax_documents",
+            "other_documents"
+          ],
+          "properties": {
+            "operation_notices": {
+              "$ref": "#/definitions/scopeFamily"
+            },
+            "statements": {
+              "$ref": "#/definitions/scopeFamily"
+            },
+            "tax_documents": {
+              "$ref": "#/definitions/scopeFamily"
+            },
+            "other_documents": {
+              "$ref": "#/definitions/scopeFamily"
+            }
+          }
+        },
+        "history": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "maxMonths",
+            "incrementalWindow",
+            "controlRunRequired"
+          ],
+          "properties": {
+            "maxMonths": {
+              "const": 13
+            },
+            "incrementalWindow": {
+              "type": "string",
+              "minLength": 1
+            },
+            "observedOldestMonth": {
+              "type": "string",
+              "pattern": "^[0-9]{4}-[0-9]{2}$"
+            },
+            "controlRunRequired": {
+              "const": true
+            }
+          }
+        },
+        "stableKey": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "limits": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
     }
   },
   "allOf": [
@@ -155,6 +242,57 @@
           }
         }
       }
+    },
+    {
+      "if": {
+        "properties": {
+          "service": {
+            "const": "bourse_direct"
+          }
+        },
+        "required": [
+          "service"
+        ]
+      },
+      "then": {
+        "required": [
+          "scope"
+        ]
+      }
     }
-  ]
+  ],
+  "definitions": {
+    "scopeFamily": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "availability",
+        "reason",
+        "extension"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "implemented",
+            "documented"
+          ]
+        },
+        "availability": {
+          "enum": [
+            "observed",
+            "unverified"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "extension": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
 }

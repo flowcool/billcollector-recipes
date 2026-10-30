@@ -13,12 +13,12 @@ uv pip install --python .venv/bin/python -r requirements-dev.txt
 .venv/bin/python -m unittest discover -s tests -v
 ```
 
-CI also exports the Selenium catalog with `scripts/export-recipes.sh`.
-Use a disposable destination: this command replaces matching recipe files.
+CI exports the Playwright catalog with `scripts/export-playwright-recipes.sh`.
+Use a disposable destination and the exporter's exact engine revision.
 
 ## Compatibility
 
-`recipes/`, the root schemas and `scripts/export-recipes.sh` implement the Selenium contract.
+The Selenium catalog, schemas and exporter are retired. Git history preserves them.
 For a Playwright port or export change, first read
 `docs/plans/playwright-migration.md` and its linked source assessment.
 `playwright/`, `schema/playwright/` and `scripts/export-playwright-recipes.sh`
