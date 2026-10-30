@@ -52,15 +52,37 @@ services:
       arguments:
       - url: https://client.mint-energie.com/Pages/Compte/factures_liste.aspx
     step: 3
-  - description: Download all filtered invoices in PDF format.
+  - step: 4
+    description: Bind native ZIP download controls to one invoice period per contract.
+    methods:
+    - method: evaluate
+      arguments:
+      - expression: () => { const rows = [...document.querySelectorAll('.factulist .factu')]; const original
+          = document.querySelector('#BT_Download'); if (!original || !rows.length) throw new Error('No
+          invoice controls'); document.querySelectorAll('[data-bc-mint-download]').forEach(e=>e.remove());
+          const periods = new Set(); for (const row of rows) { const contract = row.firstElementChild?.querySelector('b')?.textContent.trim();
+          const date = row.querySelector('.details > div:first-child b')?.textContent.trim(); const match
+          = date?.match(/^(\d{2})\/(\d{2})\/(\d{4})$/); if (!contract || !match) throw new Error('Missing
+          invoice identity'); const filters = {'DDL_Year':match[3], 'DDL_Month':match[2], 'DDL_Contract':contract,
+          'DDL_Format':'1'}; for (const [id,value] of Object.entries(filters)) { const field = document.getElementById(id);
+          if (!field || ![...field.options].some(o=>o.value===value)) throw new Error('Invoice filter
+          unavailable'); } const period = contract + ':' + match[3] + '-' + match[2]; if (periods.has(period))
+          throw new Error('Multiple invoices in one contract month'); periods.add(period); const button
+          = original.cloneNode(true); button.removeAttribute('id'); button.removeAttribute('name'); button.type='button';
+          button.setAttribute('data-bc-mint-download','1'); button.setAttribute('data-bc-invoice-key',period
+          + '-' + match[1]); button.onclick = () => { for (const [id,value] of Object.entries(filters))
+          document.getElementById(id).value=value; original.click(); }; row.appendChild(button); } }
+  - description: Download one original invoice PDF per stable source key.
     methods:
     - method: locator
       arguments:
-      - selector: '#BT_Download'
+      - selector: '[data-bc-mint-download]'
     - method: download_all
       arguments:
-      - key_attribute: id
+      - key_attribute: data-bc-invoice-key
         max_items: 200
         timeout_ms: 600000
         event_window_ms: 10000
-    step: 4
+        incremental: true
+        unpack: pdf
+    step: 5

@@ -9,7 +9,7 @@ import tempfile
 import yaml
 from jsonschema import validate
 
-REVISION = "b401f801c9184f6b0c8917fb8d06a79fa0f0e917"
+REVISION = "45e530b7d6240abb308810183dbe4f65aae5b6dc"
 MANIFEST = ".billcollector-playwright.json"
 SCHEMA = "recipe-pw-schema.yaml"
 
@@ -102,10 +102,20 @@ def catalog(source):
                     or proof.get("firstRunNew") != expected_count
                     or proof.get("firstRunPdfReadback") != expected_count
                     or proof.get("repeatRunNew") != 0
+                    or proof.get("firstRunClicks") != expected_count
+                    or proof.get("firstRunDownloadEvents") != expected_count
+                    or proof.get("repeatRunClicks") != 0
+                    or proof.get("repeatRunDownloadEvents") != 0
+                    or proof.get("independentSessions") is not True
                     or proof.get("recipeSha256") != hashlib.sha256(data).hexdigest()):
                 raise ValueError("Qualified metadata must bind complete two-pass proof to this recipe")
             if any(s["methods"][0]["method"] == "wait_user" for s in steps):
                 raise ValueError("Qualified unattended recipes cannot wait for an operator")
+            for step in downloads:
+                method = step["methods"][-1]
+                options = {k: v for arg in method.get("arguments", []) for k, v in arg.items()}
+                if method["method"] != "download_all" or options.get("incremental") is not True or options.get("key_attribute") != "data-bc-invoice-key":
+                    raise ValueError("Qualified recipes require stable incremental invoice keys")
         if expected.name in files:
             raise ValueError("Duplicate export filename")
         files[expected.name] = data

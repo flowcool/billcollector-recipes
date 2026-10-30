@@ -1,19 +1,24 @@
 service: free
 engine: playwright-daemon
-engineRevision: b401f801c9184f6b0c8917fb8d06a79fa0f0e917
-status: experimental
+engineRevision: 45e530b7d6240abb308810183dbe4f65aae5b6dc
+status: qualified
 coverage: all-available-invoices
 limitations:
-- Qualification covers one configured Freebox account.
-- 'The portal regenerates PDF bytes: both successful passes published 19 files. Hash-only
-  engine deduplication does not meet zero-new acceptance.'
-- Keep output disconnected from Paperless until repeat identity is resolved.
+- Qualified on one Freebox account with 19 invoices across all available years.
+- The stable key is the source invoice month and year. Known keys are not downloaded again.
+- Selenium history is not imported. Infra must reconcile prior delivery before production publication.
 validation:
   synthetic: tests/unattended_engine_probe.py
-  realProvider: blocked-repeat-new-files
+  realProvider: two-pass-qualified
   date: '2026-10-30'
   expectedDocuments: 19
   firstRunNew: 19
-  repeatRunNew: 19
-  recipeSha256: 82c88f6d93cecbe8cf2539f9d2363f68264de70cce9d8d4ea645e8a0d924ebab
   firstRunPdfReadback: 19
+  repeatRunNew: 0
+  firstRunClicks: 19
+  firstRunDownloadEvents: 19
+  repeatRunClicks: 0
+  repeatRunDownloadEvents: 0
+  keySetsSha256: 19ae5ec0f17764ca79f25ed9082bd3fb41971fe661f56e991c554298c9cfa864
+  independentSessions: true
+  recipeSha256: 3f60d4bb026e804913ee44d7e94c0a21ad9d8c5e2a2980c48d0776b460f41eb4

@@ -1,14 +1,12 @@
 service: cc_genevois
 engine: playwright-daemon
-engineRevision: b401f801c9184f6b0c8917fb8d06a79fa0f0e917
+engineRevision: 45e530b7d6240abb308810183dbe4f65aae5b6dc
 status: qualified
 coverage: all-available-invoices
 limitations:
-- Qualified on one configured contract with five issued invoices.
-- The portal rerenders invoice controls after download; keys are rebound from source
-  invoice numbers.
-- Selenium history is not imported; Infra must reconcile prior delivery before production
-  publication.
+- Qualified on one contract with five issued invoices.
+- The stable key is the source invoice number. Controls are rebound after portal rerenders.
+- Selenium history is not imported. Infra must reconcile prior delivery before production publication.
 validation:
   synthetic: tests/unattended_engine_probe.py
   realProvider: two-pass-qualified
@@ -17,4 +15,10 @@ validation:
   firstRunNew: 5
   firstRunPdfReadback: 5
   repeatRunNew: 0
-  recipeSha256: 54ccc6aeae92b766c802582d0bf982559756a71dd4a743abe5a0f026b06bbaed
+  firstRunClicks: 5
+  firstRunDownloadEvents: 5
+  repeatRunClicks: 0
+  repeatRunDownloadEvents: 0
+  keySetsSha256: e6c42e066a5b8c3b8db51370d3b6d1e2affa3033617a091ee047a54468af2502
+  independentSessions: true
+  recipeSha256: 8064c6615ddf2117ef17ddaeae644859468dae3d6cd180581e9fdaef7c5edea3

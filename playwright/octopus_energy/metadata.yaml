@@ -1,12 +1,11 @@
 service: octopus_energy
 engine: playwright-daemon
-engineRevision: b401f801c9184f6b0c8917fb8d06a79fa0f0e917
+engineRevision: 45e530b7d6240abb308810183dbe4f65aae5b6dc
 status: experimental
 coverage: all-available-invoices
 limitations:
 - The configured account explicitly has no issued invoices.
-- The preparation recipe stops after authentication and invoice navigation; download
-  controls remain unqualified.
+- The preparation recipe stops after authentication and invoice navigation; download controls remain unqualified.
 - Payment schedules are excluded from issued-invoice acceptance.
 validation:
   synthetic: tests/unattended_engine_probe.py

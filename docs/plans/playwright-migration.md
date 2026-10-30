@@ -8,9 +8,14 @@ available until Infra completes each provider cutover.
 ## Mechanism
 
 The exact qualification baseline is fork revision
-`b401f801c9184f6b0c8917fb8d06a79fa0f0e917`. Its schema is vendored unchanged.
+`45e530b7d6240abb308810183dbe4f65aae5b6dc`. Its schema is vendored unchanged.
 Recipes use engine credential placeholders, native Playwright navigation,
-optional cookie dismissal and bounded `download_all`. Fulli also uses
+optional cookie dismissal and bounded `download_all` with `incremental: true`.
+Source invoice numbers or billing periods identify documents across sessions.
+Known keys are skipped before clicking. Mint selects each contract month through
+the portal's native filters and uses `unpack: pdf` to retain the one original PDF
+member byte-for-byte. Multiple invoices in one contract month fail closed.
+Fulli also uses
 `click_until_absent` with invoice rows as its progress check. Free expands all
 invoice-year panels before collecting the links. No recipe stores credentials,
 account identifiers or authenticated download URLs.
@@ -21,7 +26,9 @@ For each provider, use a fresh private database, browser profile and download
 root. Disable consumers. Read credentials directly into memory from the existing
 vault item. Run the exact recipe twice with the actual engine. The first run
 must succeed and download every available invoice. Verify each new file has a
-PDF signature. The second run must succeed with zero new publications. Retain
+PDF signature. Use a second independent browser profile with the same task DB.
+Its source key set must match the first session. The second run must succeed
+with zero clicks, zero download events and zero new publications. Retain
 private originals and browser evidence outside Git. Record aggregate counts,
 recipe SHA256 and exact engine revision in metadata and the owning issue.
 Octopus must collect issued invoices; a payment schedule is insufficient.
@@ -41,13 +48,13 @@ human-login pause cannot qualify an unattended recipe.
 Run `python -m unittest discover -s tests -v` and the isolated browser probe.
 Keep the existing Selenium export checks. Export Playwright only into a
 disposable directory with `scripts/export-playwright-recipes.sh SOURCE DEST
---engine-revision b401f801c9184f6b0c8917fb8d06a79fa0f0e917`. The exporter retains
+--engine-revision 45e530b7d6240abb308810183dbe4f65aae5b6dc`. The exporter retains
 its ownership manifest, mixed-directory refusal and caught-error rollback.
 Never use it directly against the live daemon recipe directory.
 
 Publish one reviewed recipe PR and a versioned release. Infra pins that release
 under `infra-1lr1.4` through `.8`. The source qualification owner is
-`infra-u4hbm`. The older single-document synthetic report describes its original
+`infra-u4hbm`; incremental delivery is tracked by `infra-25goi`. The older single-document synthetic report describes its original
 snapshot and is historical evidence.
 
 ## Recovery
