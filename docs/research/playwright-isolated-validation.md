@@ -1,5 +1,8 @@
 # Isolated Playwright catalog proof
 
+> Historical snapshot. Its baseline and limits apply only to that artifact.
+> For the active catalog, read ../../README.md and ../plans/playwright-migration.md.
+
 Date: 2026-10-21. Synthetic data only. No provider account or vault access.
 
 ## Test environment

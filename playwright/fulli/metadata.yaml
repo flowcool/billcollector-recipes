@@ -1,20 +1,24 @@
 service: fulli
 engine: playwright-daemon
-engineRevision: 501898cade0b9981092db2011fb3fc02812af8b3
-status: experimental
-coverage: first-listed-document
+engineRevision: 4d2a893be89a83c47b940c174bad3fa75bbf2ade
+status: qualified
+coverage: all-available-invoices
 limitations:
-- Supervised login and consent are required on every run; no automatic credential
-  submission.
-- Provider selectors, account selection and download events have not been checked
-  on a real account.
-- An empty list fails; a known-content download can succeed without a new publication.
-- Task-scoped SQLite history is not imported from Selenium; keep output disconnected
-  from Paperless.
-- Only the first DOM match is selected; newest order and complete collection are not
-  guaranteed.
-- Initial visible list only; no load-more or pagination. Captcha requires operator
-  action.
+- Qualified on one account with all 14 available invoices, including hidden history rows.
+- The stable key is the source billing month and year. Duplicate periods fail closed.
+- Selenium history is not imported. Infra must reconcile prior delivery before production publication.
 validation:
-  synthetic: tests/engine_probe.py
-  realProvider: not-run
+  synthetic: tests/unattended_engine_probe.py
+  realProvider: two-pass-qualified
+  date: '2026-11-01'
+  expectedDocuments: 14
+  firstRunNew: 14
+  firstRunPdfReadback: 14
+  repeatRunNew: 0
+  firstRunClicks: 14
+  firstRunDownloadEvents: 14
+  repeatRunClicks: 0
+  repeatRunDownloadEvents: 0
+  keySetsSha256: 4ebf5d7235f9d3cc421bea5c5929bf8926e8fcf2534e480254da7f3558b965f8
+  independentSessions: true
+  recipeSha256: 14bddd891195b4718160346230786d71738b18ae73dd9e60124252eb2c6ef799

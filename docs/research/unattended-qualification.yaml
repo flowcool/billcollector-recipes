@@ -1,0 +1,152 @@
+date: '2026-10-30'
+engine_revision: 45e530b7d6240abb308810183dbe4f65aae5b6dc
+source_issue: infra-25goi
+previous_source_issue: infra-u4hbm
+production_changed: false
+generated_from: playwright/*/metadata.yaml
+providers:
+  cc_genevois:
+    status: qualified
+    coverage: all-available-invoices
+    limitations:
+    - Qualified on one contract with five issued invoices.
+    - The stable key is the source invoice number. Controls are rebound after portal rerenders.
+    - Selenium history is not imported. Infra must reconcile prior delivery before production publication.
+    validation:
+      synthetic: tests/unattended_engine_probe.py
+      realProvider: two-pass-qualified
+      date: '2026-10-30'
+      expectedDocuments: 5
+      firstRunNew: 5
+      firstRunPdfReadback: 5
+      repeatRunNew: 0
+      firstRunClicks: 5
+      firstRunDownloadEvents: 5
+      repeatRunClicks: 0
+      repeatRunDownloadEvents: 0
+      keySetsSha256: e6c42e066a5b8c3b8db51370d3b6d1e2affa3033617a091ee047a54468af2502
+      independentSessions: true
+      recipeSha256: 8064c6615ddf2117ef17ddaeae644859468dae3d6cd180581e9fdaef7c5edea3
+    real_proof_runtime_revisions:
+    - 09317f2a2bbb2f9709617d11cc1353403a170032
+    equivalence_requirement: Collector, runner, login, vault, persistence and schema files unchanged from
+      proof runtime; scheduler/UI/docs changes do not affect isolated recipe runs.
+  free:
+    status: qualified
+    coverage: all-available-invoices
+    limitations:
+    - Qualified on one Freebox account with 19 invoices across all available years.
+    - The stable key is the source invoice month and year. Known keys are not downloaded again.
+    - Selenium history is not imported. Infra must reconcile prior delivery before production publication.
+    validation:
+      synthetic: tests/unattended_engine_probe.py
+      realProvider: two-pass-qualified
+      date: '2026-10-30'
+      expectedDocuments: 19
+      firstRunNew: 19
+      firstRunPdfReadback: 19
+      repeatRunNew: 0
+      firstRunClicks: 19
+      firstRunDownloadEvents: 19
+      repeatRunClicks: 0
+      repeatRunDownloadEvents: 0
+      keySetsSha256: 19ae5ec0f17764ca79f25ed9082bd3fb41971fe661f56e991c554298c9cfa864
+      independentSessions: true
+      recipeSha256: 3f60d4bb026e804913ee44d7e94c0a21ad9d8c5e2a2980c48d0776b460f41eb4
+    real_proof_runtime_revisions:
+    - d7b72afea38e7500b0481c7df57d45be6c575653
+    equivalence_requirement: Collector, runner, login, vault, persistence and schema files unchanged from
+      proof runtime; scheduler/UI/docs changes do not affect isolated recipe runs.
+  fulli:
+    status: qualified
+    coverage: all-available-invoices
+    limitations:
+    - Qualified on one account with all 15 available invoices, including hidden history rows.
+    - The stable key is the source billing month and year. Duplicate periods fail closed.
+    - Selenium history is not imported. Infra must reconcile prior delivery before production publication.
+    validation:
+      synthetic: tests/unattended_engine_probe.py
+      realProvider: two-pass-qualified
+      date: '2026-10-30'
+      expectedDocuments: 15
+      firstRunNew: 15
+      firstRunPdfReadback: 15
+      repeatRunNew: 0
+      firstRunClicks: 15
+      firstRunDownloadEvents: 15
+      repeatRunClicks: 0
+      repeatRunDownloadEvents: 0
+      keySetsSha256: bb2f8fb4a760339080919e0ffeb80f55abe377db05486e76131157a79bca1043
+      independentSessions: true
+      recipeSha256: 030609c8577d41fe0e2a45b1af696dc1cf61e0148772d8bc95969dd79537f4a5
+    real_proof_runtime_revisions:
+    - 09317f2a2bbb2f9709617d11cc1353403a170032
+    equivalence_requirement: Collector, runner, login, vault, persistence and schema files unchanged from
+      proof runtime; scheduler/UI/docs changes do not affect isolated recipe runs.
+  mint_energie:
+    status: qualified
+    coverage: all-available-invoices
+    limitations:
+    - Qualified on one account with one issued invoice.
+    - The native per-contract monthly ZIP must contain exactly one PDF. Its original member bytes are
+      retained.
+    - More than one invoice in the same contract month fails closed; that source case is not qualified.
+    - Selenium history is not imported. Infra must reconcile prior delivery before production publication.
+    validation:
+      synthetic: tests/unattended_engine_probe.py
+      realProvider: two-pass-qualified
+      date: '2026-10-30'
+      expectedDocuments: 1
+      firstRunNew: 1
+      firstRunPdfReadback: 1
+      repeatRunNew: 0
+      firstRunClicks: 1
+      firstRunDownloadEvents: 1
+      repeatRunClicks: 0
+      repeatRunDownloadEvents: 0
+      keySetsSha256: 30d7dc10d92d024ca3f16580e23d924fe9b4516c48f1bb221b6c7eba8a38bb11
+      independentSessions: true
+      recipeSha256: 1484675df9d46479f76278d5064ce0afd96984db1b636f45ddbbfb0376cb5b8c
+    real_proof_runtime_revisions:
+    - d7b72afea38e7500b0481c7df57d45be6c575653
+    equivalence_requirement: Collector, runner, login, vault, persistence and schema files unchanged from
+      proof runtime; scheduler/UI/docs changes do not affect isolated recipe runs.
+  octopus_energy:
+    status: experimental
+    coverage: all-available-invoices
+    limitations:
+    - The configured account explicitly has no issued invoices.
+    - The preparation recipe stops after authentication and invoice navigation; download controls remain
+      unqualified.
+    - Payment schedules are excluded from issued-invoice acceptance.
+    validation:
+      synthetic: tests/unattended_engine_probe.py
+      realProvider: blocked-no-invoices
+      date: '2026-10-30'
+      recipeSha256: 25f93828e284a28b9348545a5e17cc940fe19d8a626b84eb82fc02f082800787
+    source_recheck:
+      invoice_table_empty: true
+      payment_schedule_excluded: true
+      invoice_download_controls_qualified: false
+validation:
+  unit_tests: 14
+  synthetic:
+    external_requests: 0
+    independent_browser_profiles: true
+    repeat_clicks: 0
+    repeat_download_events: 0
+    providers:
+      free:
+        first_new: 2
+        repeat_new: 0
+      fulli:
+        first_new: 3
+        repeat_new: 0
+      mint_energie:
+        first_new: 2
+        repeat_new: 0
+        original_pdf_member_byte_identity: true
+      cc_genevois:
+        first_new: 2
+        repeat_new: 0
+        rerender_after_each_download: true
