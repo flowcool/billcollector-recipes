@@ -2,13 +2,13 @@
 import argparse
 import json
 import os
-from pathlib import Path
 import tempfile
+from pathlib import Path
 
 import yaml
-from jsonschema import validate
+from jsonschema import ValidationError, validate
 
-REVISION = "501898cade0b9981092db2011fb3fc02812af8b3"
+REVISION = "89a89cc2c55c7dfc53ffb07acd73630621f2911b"
 MANIFEST = ".billcollector-playwright.json"
 SCHEMA = "recipe-pw-schema.yaml"
 
@@ -29,6 +29,20 @@ def check_steps(steps, nested=False):
         elif names == ["goto"] and not nested:
             if not methods[0].get("arguments", [{}])[0].get("url", "").startswith("https://"):
                 raise ValueError("Navigation must use a public HTTPS URL")
+        elif names == ["bourse_direct"]:
+            options = {k: v for arg in methods[0].get("arguments", []) for k, v in arg.items()}
+            if (options.get("account_type") not in {"PEA", "PEA-PME"}
+                    or type(options.get("max_months")) is not int
+                    or not 1 <= options["max_months"] <= 120
+                    or type(options.get("max_items")) is not int
+                    or not 1 <= options["max_items"] <= 200
+                    or type(options.get("timeout_ms")) is not int
+                    or not 1 <= options["timeout_ms"] <= 7200000):
+                raise ValueError("Invalid Bourse Direct bounds")
+        elif names == ["login"]:
+            args = {k: v for arg in methods[0].get("arguments", []) for k, v in arg.items()}
+            if not args.get("success", {}).get("selector") or "submit" not in step:
+                raise ValueError("Native login requires a success selector and submit block")
         elif names in (["locator", "click"], ["locator", "first", "click"]):
             if not methods[0].get("arguments", [{}])[0].get("selector"):
                 raise ValueError("Missing selector")
@@ -37,7 +51,7 @@ def check_steps(steps, nested=False):
                 raise ValueError("Click must have a finite timeout")
         else:
             raise ValueError(f"Unsupported method chain: {names}")
-        if "steps" in step and names != ["expect_download"]:
+        if "steps" in step and names not in (["expect_download"], ["login"]):
             raise ValueError("Unexpected nested steps")
 
 
@@ -53,7 +67,10 @@ def catalog(source):
         if not provider.is_dir() or provider.is_symlink():
             raise ValueError(f"Unexpected provider entry: {provider}")
         metadata = yaml.safe_load((provider / "metadata.yaml").read_text())
-        validate(metadata, metadata_schema)
+        try:
+            validate(metadata, metadata_schema)
+        except ValidationError as error:
+            raise ValueError("Invalid provider metadata") from error
         service = metadata["service"]
         if service != provider.name:
             raise ValueError("Provider directory and service differ")
@@ -63,18 +80,28 @@ def catalog(source):
             raise ValueError("Expected exactly one named recipe per provider")
         data = expected.read_bytes()
         recipe = yaml.safe_load(data)
-        validate(recipe, schema)
+        try:
+            validate(recipe, schema)
+        except ValidationError as error:
+            raise ValueError("Invalid provider recipe") from error
         if len(recipe.get("services", [])) != 1 or recipe["services"][0]["serviceName"] != service:
             raise ValueError("Recipe service differs from metadata")
         steps = recipe["services"][0]["steps"]
         check_steps(steps)
-        if sum(s["methods"][0]["method"] == "expect_download" for s in steps) != 1:
+        tracked = [s for s in steps if s.get("methods") and
+                   s["methods"][-1]["method"] in {"expect_download", "download_all", "bourse_direct"}]
+        if len(tracked) != 1:
             raise ValueError("Current coverage requires one tracked download")
-        if [s["methods"][0]["method"] for s in steps[:2]] != ["goto", "wait_user"]:
-            raise ValueError("Expected supervised authentication")
+        if steps[0]["methods"][0]["method"] != "goto":
+            raise ValueError("Expected public HTTPS entry point")
         if expected.name in files:
             raise ValueError("Duplicate export filename")
         files[expected.name] = data
+        adapter = provider / f"{service}_adapter.py"
+        if adapter.exists():
+            if service != "bourse_direct" or adapter.is_symlink():
+                raise ValueError("Unsupported adapter file")
+            files[adapter.name] = adapter.read_bytes()
     return files
 
 
@@ -93,7 +120,8 @@ def export(source, destination, revision):
             raise ValueError("Invalid ownership manifest")
         previous = set(content["files"])
         if any(not isinstance(n, str) or Path(n).name != n or
-               not (n == SCHEMA or (n.startswith("recipe-pw__") and n.endswith(".yaml")))
+               not (n == SCHEMA or (n.startswith("recipe-pw__") and n.endswith(".yaml"))
+                    or n == "bourse_direct_adapter.py")
                for n in previous):
             raise ValueError("Unsafe ownership manifest")
     for path in destination.iterdir():
@@ -103,6 +131,9 @@ def export(source, destination, revision):
             raise ValueError("Unmanaged Playwright recipe")
     if (destination / SCHEMA).exists() and (destination / SCHEMA).read_bytes() != files[SCHEMA]:
         raise ValueError("Existing runtime schema differs")
+        if ((destination / "bourse_direct_adapter.py").exists()
+                and "bourse_direct_adapter.py" not in previous):
+            raise ValueError("Unmanaged adapter file")
     files[MANIFEST] = (json.dumps({"engine": "playwright-daemon", "revision": revision,
                                   "files": sorted(files)}, indent=2) + "\n").encode()
     affected = previous | set(files)

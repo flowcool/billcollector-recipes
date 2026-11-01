@@ -1,9 +1,9 @@
 import importlib.util
 import json
-from pathlib import Path
 import shutil
 import tempfile
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
 import yaml
@@ -30,9 +30,9 @@ class PlaywrightCatalogTests(unittest.TestCase):
     def snapshot(self):
         return {p.name: p.read_bytes() for p in self.dest.iterdir()}
 
-    def test_five_ports_and_repeat_export_preserve_unrelated_files(self):
+    def test_six_ports_and_repeat_export_preserve_unrelated_files(self):
         self.export()
-        self.assertEqual(len(list(self.dest.glob("recipe-pw__*.yaml"))), 5)
+        self.assertEqual(len(list(self.dest.glob("recipe-pw__*.yaml"))), 6)
         self.assertFalse(list(self.dest.glob("*metadata*")))
         (self.dest / "keep.txt").write_text("keep")
         before = self.snapshot()
