@@ -10,16 +10,19 @@ provider activation and Paperless integration.
 | Provider | Recorded coverage | Real-provider qualification |
 | --- | --- | --- |
 | Free | All offered invoices across available years | 19 new, then 0 |
-| Fulli | All offered invoices, including hidden history rows | 15 new, then 0 |
+| Fulli | All offered invoices, including hidden history rows | 14 new, then 0 |
 | Mint Energie | Original PDF from the monthly contract ZIP | 1 new, then 0; multiple PDFs per month fail closed |
 | CC Genevois | All offered invoices by invoice number | 5 new, then 0 |
 | Octopus Energy | Invoice preparation only | Experimental: account has no issued invoices |
 | Bourse Direct | Operation notices; GetAll up to 13 offered months | Experimental: changed recipe has synthetic proof only |
 
-Read `playwright/<provider>/metadata.yaml` before use. The four qualified
-providers retain their exact qualification baseline
-`45e530b7d6240abb308810183dbe4f65aae5b6dc`. This does not claim a new live run
-on the newer engine. Octopus payment schedules do not qualify as invoices.
+Read `playwright/<provider>/metadata.yaml` before use. Free, Mint Energie and
+CC Genevois retain qualification baseline `45e530b7d6240abb308810183dbe4f65aae5b6dc`.
+Fulli was requalified on 2026-11-01 against
+`4d2a893be89a83c47b940c174bad3fa75bbf2ade`. Its available set decreased from
+15 to 14 periods; only April 2025 disappeared. See the
+[Fulli navigation regression](docs/fulli-login-navigation.md).
+Octopus payment schedules do not qualify as invoices.
 Bourse Direct's old PEA proof covers October 2026 only; PEA-PME is simulated.
 See [Bourse Direct scope and bounds](docs/bourse-direct.md).
 

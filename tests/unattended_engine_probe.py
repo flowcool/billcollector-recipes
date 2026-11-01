@@ -56,6 +56,8 @@ def main():
     parser.add_argument("engine", type=Path)
     parser.add_argument("--provider", choices=["free", "fulli", "mint_energie", "cc_genevois"])
     parser.add_argument("--guards-only", action="store_true")
+    parser.add_argument("--fulli-homepage", action="store_true",
+                        help="Replay a stale session returning the public homepage once")
     args = parser.parse_args()
     import subprocess
     if args.guards_only:
@@ -84,6 +86,7 @@ def main():
         clicks = 0
         events = 0
         key_sets = {}
+        login_visits_by_run = {}
         original_snapshot = runner.collection._snapshot
         original_download = runner.collection._download_one
 
@@ -107,14 +110,30 @@ def main():
             runner._ensure_pdf_preference(profile)
             ctx.context = playwright.chromium.launch_persistent_context(str(profile), headless=True, service_workers="block", accept_downloads=True)
             ctx.page = ctx.context.new_page()
+            if args.fulli_homepage:
+                ctx.page.set_default_timeout(1000)
+                ctx.page.set_default_navigation_timeout(30000)
+            login_visits = 0
             ctx.page.on("download", event)
             ctx.bcs.page = ctx.page
             def route(r):
+                nonlocal login_visits
                 url = urlparse(r.request.url)
                 if url.hostname not in {"subscribe.free.fr", "www.fulli.com", "client.mint-energie.com", "abonnes.cc-genevois.fr"}:
                     unexpected.append(url.hostname)
                     r.abort()
                     return
+                if args.fulli_homepage and url.hostname == "www.fulli.com" and url.path == "/customer/login":
+                    login_visits += 1
+                    login_visits_by_run[attempt] = login_visits
+                    if login_visits == 1:
+                        # Fulfill the final landing in place. A routed HTTP redirect
+                        # can bypass Playwright routing for its next request.
+                        r.fulfill(status=200, content_type="text/html", body=
+                                  '<script>history.replaceState(null,"","/")</script>'
+                                  '<nav class="UserAccountMenu"><a class="UserAccountMenu-button" '
+                                  'href="/customer/login">Espace Client</a></nav>')
+                        return
                 if url.path.endswith(".zip"):
                     # Native per-period Mint ZIP. Preserve the PDF BOM and bytes.
                     payload = b"\xef\xbb\xbf%PDF-1.4\nsynthetic " + url.path.encode() + b"\n%%EOF\n"
@@ -160,6 +179,8 @@ def main():
                         assert result == "success" and len(rows) == expected, (service,result,len(rows),expected,db.conn.execute("SELECT error FROM PageStatus WHERE run_id=? ORDER BY id DESC LIMIT 1",(run,)).fetchone()[0])
                         assert new == (count if attempt == 0 else 0), (service,new,attempt)
                         assert clicks == events == expected, (service, clicks, events, expected)
+                        if args.fulli_homepage and service == "fulli":
+                            assert login_visits_by_run[attempt] == 2
                         if attempt == 0:
                             identity = key_sets.copy()
                             assert len(next(iter(identity.values()))) == count
@@ -175,7 +196,8 @@ def main():
                         counts.append(new)
                     results.append(dict(service=service, first_new=counts[0], repeat_new=counts[1]))
             assert not unexpected, unexpected
-            print(json.dumps(dict(revision=REVISION,providers=results,external_requests=unexpected)))
+            print(json.dumps(dict(revision=REVISION,providers=results,external_requests=unexpected,
+                                  fulli_homepage=args.fulli_homepage)))
         finally:
             db.close()
 
