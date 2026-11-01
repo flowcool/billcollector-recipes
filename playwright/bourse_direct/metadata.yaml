@@ -1,6 +1,6 @@
 service: bourse_direct
 engine: playwright-daemon
-engineRevision: 89a89cc2c55c7dfc53ffb07acd73630621f2911b
+engineRevision: c87f980b985d526dac95760e477cec95f280896d
 status: experimental
 coverage: offered-operation-notices
 limitations:

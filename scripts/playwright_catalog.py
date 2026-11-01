@@ -1,14 +1,15 @@
 """Validate the catalog and export only managed Playwright runtime files."""
 import argparse
+import hashlib
 import json
 import os
-import tempfile
 from pathlib import Path
+import tempfile
 
 import yaml
-from jsonschema import ValidationError, validate
+from jsonschema import validate
 
-REVISION = "89a89cc2c55c7dfc53ffb07acd73630621f2911b"
+REVISION = "c87f980b985d526dac95760e477cec95f280896d"
 MANIFEST = ".billcollector-playwright.json"
 SCHEMA = "recipe-pw-schema.yaml"
 
@@ -29,26 +30,36 @@ def check_steps(steps, nested=False):
         elif names == ["goto"] and not nested:
             if not methods[0].get("arguments", [{}])[0].get("url", "").startswith("https://"):
                 raise ValueError("Navigation must use a public HTTPS URL")
-        elif names == ["bourse_direct"]:
-            options = {k: v for arg in methods[0].get("arguments", []) for k, v in arg.items()}
-            if (options.get("account_type") not in {"PEA", "PEA-PME"}
-                    or type(options.get("max_months")) is not int
-                    or not 1 <= options["max_months"] <= 120
-                    or type(options.get("max_items")) is not int
-                    or not 1 <= options["max_items"] <= 200
-                    or type(options.get("timeout_ms")) is not int
-                    or not 1 <= options["timeout_ms"] <= 7200000):
-                raise ValueError("Invalid Bourse Direct bounds")
-        elif names == ["login"]:
-            args = {k: v for arg in methods[0].get("arguments", []) for k, v in arg.items()}
-            if not args.get("success", {}).get("selector") or "submit" not in step:
-                raise ValueError("Native login requires a success selector and submit block")
-        elif names in (["locator", "click"], ["locator", "first", "click"]):
+        elif names in (["locator", "click"], ["locator", "first", "click"],
+                       ["locator", "fill"], ["locator", "download_all"],
+                       ["locator", "click_until_absent"], ["locator", "bourse_direct"]):
             if not methods[0].get("arguments", [{}])[0].get("selector"):
                 raise ValueError("Missing selector")
-            timeout = methods[-1].get("arguments", [{}])[0].get("timeout")
-            if not isinstance(timeout, int) or not 0 < timeout <= 60000:
-                raise ValueError("Click must have a finite timeout")
+            options = {k: v for arg in methods[-1].get("arguments", []) for k, v in arg.items()}
+            if names[-1] == "bourse_direct":
+                if (options.get("account_type") not in {"PEA", "PEA-PME"}
+                        or options.get("incremental") is not True
+                        or type(options.get("max_months")) is not int or not 1 <= options["max_months"] <= 13
+                        or type(options.get("max_items")) is not int or not 100 <= options["max_items"] <= 200
+                        or type(options.get("timeout_ms")) is not int or not 1 <= options["timeout_ms"] <= 7_200_000):
+                    raise ValueError("Invalid Bourse Direct history or request bounds")
+            elif names[-1] == "click":
+                timeout = options.get("timeout")
+                if not isinstance(timeout, int) or not 0 < timeout <= 60000:
+                    raise ValueError("Click must have a finite timeout")
+            elif names[-1] == "fill":
+                if options.get("value") not in {"{{USERNAME}}", "{{PASSWORD}}"}:
+                    raise ValueError("Credentials must use engine placeholders")
+        elif names == ["login"] and not nested:
+            options = {k: v for arg in methods[0].get("arguments", []) for k, v in arg.items()}
+            if not options.get("success", {}).get("selector"):
+                raise ValueError("Login requires an authenticated success selector")
+            check_steps(step.get("steps", []), nested=True)
+            check_steps([step["submit"]], nested=True)
+        elif names == ["evaluate"] and not nested:
+            expression = methods[0].get("arguments", [{}])[0].get("expression")
+            if not isinstance(expression, str) or not expression.strip():
+                raise ValueError("DOM evaluation requires an expression")
         else:
             raise ValueError(f"Unsupported method chain: {names}")
         if "steps" in step and names not in (["expect_download"], ["login"]):
@@ -67,10 +78,7 @@ def catalog(source):
         if not provider.is_dir() or provider.is_symlink():
             raise ValueError(f"Unexpected provider entry: {provider}")
         metadata = yaml.safe_load((provider / "metadata.yaml").read_text())
-        try:
-            validate(metadata, metadata_schema)
-        except ValidationError as error:
-            raise ValueError("Invalid provider metadata") from error
+        validate(metadata, metadata_schema)
         service = metadata["service"]
         if service != provider.name:
             raise ValueError("Provider directory and service differ")
@@ -80,28 +88,44 @@ def catalog(source):
             raise ValueError("Expected exactly one named recipe per provider")
         data = expected.read_bytes()
         recipe = yaml.safe_load(data)
-        try:
-            validate(recipe, schema)
-        except ValidationError as error:
-            raise ValueError("Invalid provider recipe") from error
+        validate(recipe, schema)
         if len(recipe.get("services", [])) != 1 or recipe["services"][0]["serviceName"] != service:
             raise ValueError("Recipe service differs from metadata")
         steps = recipe["services"][0]["steps"]
         check_steps(steps)
-        tracked = [s for s in steps if s.get("methods") and
-                   s["methods"][-1]["method"] in {"expect_download", "download_all", "bourse_direct"}]
-        if len(tracked) != 1:
-            raise ValueError("Current coverage requires one tracked download")
+        downloads = [s for s in steps if s["methods"][-1]["method"] in
+                     {"expect_download", "download_all", "bourse_direct"}]
+        if not downloads and metadata["validation"]["realProvider"] != "blocked-no-invoices":
+            raise ValueError("At least one tracked download is required")
         if steps[0]["methods"][0]["method"] != "goto":
             raise ValueError("Expected public HTTPS entry point")
+        if metadata["status"] == "qualified":
+            proof = metadata["validation"]
+            expected_count = proof.get("expectedDocuments")
+            if (not isinstance(expected_count, int) or isinstance(expected_count, bool) or expected_count < 1
+                    or not proof.get("date")
+                    or metadata["coverage"] != "all-available-invoices"
+                    or proof["realProvider"] != "two-pass-qualified"
+                    or proof.get("firstRunNew") != expected_count
+                    or proof.get("firstRunPdfReadback") != expected_count
+                    or proof.get("repeatRunNew") != 0
+                    or proof.get("firstRunClicks") != expected_count
+                    or proof.get("firstRunDownloadEvents") != expected_count
+                    or proof.get("repeatRunClicks") != 0
+                    or proof.get("repeatRunDownloadEvents") != 0
+                    or proof.get("independentSessions") is not True
+                    or proof.get("recipeSha256") != hashlib.sha256(data).hexdigest()):
+                raise ValueError("Qualified metadata must bind complete two-pass proof to this recipe")
+            if any(s["methods"][0]["method"] == "wait_user" for s in steps):
+                raise ValueError("Qualified unattended recipes cannot wait for an operator")
+            for step in downloads:
+                method = step["methods"][-1]
+                options = {k: v for arg in method.get("arguments", []) for k, v in arg.items()}
+                if method["method"] != "download_all" or options.get("incremental") is not True or options.get("key_attribute") != "data-bc-invoice-key":
+                    raise ValueError("Qualified recipes require stable incremental invoice keys")
         if expected.name in files:
             raise ValueError("Duplicate export filename")
         files[expected.name] = data
-        adapter = provider / f"{service}_adapter.py"
-        if adapter.exists():
-            if service != "bourse_direct" or adapter.is_symlink():
-                raise ValueError("Unsupported adapter file")
-            files[adapter.name] = adapter.read_bytes()
     return files
 
 
@@ -120,8 +144,7 @@ def export(source, destination, revision):
             raise ValueError("Invalid ownership manifest")
         previous = set(content["files"])
         if any(not isinstance(n, str) or Path(n).name != n or
-               not (n == SCHEMA or (n.startswith("recipe-pw__") and n.endswith(".yaml"))
-                    or n == "bourse_direct_adapter.py")
+               not (n == SCHEMA or (n.startswith("recipe-pw__") and n.endswith(".yaml")))
                for n in previous):
             raise ValueError("Unsafe ownership manifest")
     for path in destination.iterdir():
@@ -131,9 +154,6 @@ def export(source, destination, revision):
             raise ValueError("Unmanaged Playwright recipe")
     if (destination / SCHEMA).exists() and (destination / SCHEMA).read_bytes() != files[SCHEMA]:
         raise ValueError("Existing runtime schema differs")
-        if ((destination / "bourse_direct_adapter.py").exists()
-                and "bourse_direct_adapter.py" not in previous):
-            raise ValueError("Unmanaged adapter file")
     files[MANIFEST] = (json.dumps({"engine": "playwright-daemon", "revision": revision,
                                   "files": sorted(files)}, indent=2) + "\n").encode()
     affected = previous | set(files)

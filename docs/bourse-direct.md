@@ -1,54 +1,55 @@
-# Bourse Direct recipe and adapter
+# Bourse Direct operation notices
 
-This candidate implements the accepted issue #51 contribution boundary for
-`infra-zlth.52`.
+Catalog owner: `infra-22l0n`; delivered history: `infra-5iqmw`; engine pacing: `infra-36zv1`.
+Install the catalog recipe at `/apps/recipes_playwright/recipe-pw__bourse_direct.yaml`
+and use an explicit recipe_file for the existing task. Keep its service/user
+identity, DB path, profile, journal and archive policy. Do not create a new task
+to reset deduplication. The legacy bundled filename has changed; Infra must set
+the exact exported path before loading this catalog.
 
-The exact engine revision is
-`89a89cc2c55c7dfc53ffb07acd73630621f2911b` from
-`flowcool/BillCollector#89`. The recipe uses one native `goto`, one native
-login block with final-session proof, and one standalone `bourse_direct` step.
-The step binds the notice identity fields `nc`, `type`, `year`, `month`, and
-`day`, and bounds the run to 13 months, 100 offered items, and 7,200,000 ms.
+Download All traverses at most 13 offered months, including the current month.
+For an October 2026 run it starts at October 2025. Incremental keeps the task's
+recent window (`date_window_days`, default 90), including the first partial
+month; it does not rescan 13 months automatically. An explicit recovery start
+wins in either mode, within max_months and max_items. A calendar reset to the
+current month fails closed. The source revision tracker remains active for both
+modes; unchanged notices do not create new output, corrected originals do.
 
-`playwright/bourse_direct/bourse_direct_adapter.py` is trusted catalog code.
-It declares only literal C3-validated Playwright chains. It parses the offered
-account and month, requires explicit empty-month proof, follows the offered
-notice link, checks the unique `Format PDF` link and source identity, and sends
-original bytes through the engine authenticated request context. The engine
-owns task history, notice revisions, at-least-once delivery, login state and
-run results.
+The recipe remains `incremental: true`, max_months13, max_items100,
+timeout_ms7200000. Only operation notices for the selected account are covered.
+Annual statements and tax documents require a separate decision.
 
-The catalog exporter includes the adapter beside the recipe and records the
-engine revision in its ownership manifest. No credentials, account values,
-session material, private URLs or documents are committed. The retained
-recipe `3110157` and historical five-original/five-duplicate proof remain
-historical evidence only.
+The engine uses generic Settings login_request_interval_seconds (default60,
+minimum60 for this adapter) and document_request_interval_seconds (default5).
+They use separate durable clocks and share the run deadline. No credentials
+or authenticated URLs belong in this catalog.
 
-## Offline proof
+Qualification: `python tests/bourse_direct_engine_probe.py /path/to/exact/engine`.
+Use that engine's test/runtime environment and matching Chromium. The probe
+runs its native recipe/adapter tests against loopback synthetic fixtures and
+isolated DB/profile/output. It checks 13-month GetAll, recent incremental,
+explicit overrides, boundary reset refusal and configured gates. It bypasses
+real vault preflight, real provider and Paperless; no new live run is claimed.
+Preserve the old provider proof with its original artifact and limits.
 
-The catalog suite passes with:
+Export into an unused release directory, never the live recipe mount. Infra
+owns image/schema/recipe pins, rollout and original-byte archive readback under
+its operation plan. Revert the catalog release for source rollback; deployment
+recovery must retain DB, journal, profiles and originals.
 
-```sh
-.venv/bin/python -m unittest discover -s tests -v
-```
+## Approved intake
 
-This run reports 13 passing tests, including direct adapter fixtures for
-offered identity, original-link handling and source-path fail-closed behavior.
+Florent approved operation notices only on 2026-10-30, without a new portal
+connection for this P1. The structured intake lives in `metadata.yaml` under
+`scope`. The retained PEA proof covers five October 2026 notices, then zero new
+files, on an older artifact. The current recipe remains experimental. PEA-PME
+has synthetic coverage only. Statements, IFU and other families are unverified
+extensions: their presence, keys and history need a later inventory and decision.
+The retained 2025-10 calendar boundary is an October 2026 observation. It is not
+a fresh measurement or proof of 13 live months.
 
-The exact-engine probe uses a detached `89a89cc` worktree, the matching
-Playwright browser cache and loopback fixtures only:
-
-```sh
-PLAYWRIGHT_BROWSERS_PATH=/data/cache/flow/ms-playwright \
-BC_BROWSER_DIR=/data/cache/flow/ms-playwright \
-tmp/venv/bin/python tests/bourse_direct_engine_probe.py tmp/engine89-work
-```
-
-The probe result is 80 engine tests passed, the recipe and adapter pass the
-engine C3 load/save/run-start validation, and the reported schema hash is
-`f3b92edaa352d29c794581b8ff67a5a3b7e6066a608c354e6d4799eabaafc523`.
-The probe performs no provider login, vault access, archive write or
-Paperless action. Real-provider qualification remains outside this candidate.
-
-Recovery is a focused revert of the candidate commit. Upstream publication,
-deployment and archive receipt agreement remain separate work.
+Notice identity uses nc, type, year, month and day within the existing selected
+account task. Runtime revisions remain distinct. GetAll and incremental have
+different bounds. A periodic full-window control run is required to detect late
+or changed notices outside the recent incremental window. Infra owns its cadence
+and alerts under `infra-1lr1.3`; this catalog does not change a schedule.
