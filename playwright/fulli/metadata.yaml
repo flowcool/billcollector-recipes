@@ -1,24 +1,24 @@
 service: fulli
 engine: playwright-daemon
-engineRevision: 45e530b7d6240abb308810183dbe4f65aae5b6dc
+engineRevision: 4d2a893be89a83c47b940c174bad3fa75bbf2ade
 status: qualified
 coverage: all-available-invoices
 limitations:
-- Qualified on one account with all 15 available invoices, including hidden history rows.
+- Qualified on one account with all 14 available invoices, including hidden history rows.
 - The stable key is the source billing month and year. Duplicate periods fail closed.
 - Selenium history is not imported. Infra must reconcile prior delivery before production publication.
 validation:
   synthetic: tests/unattended_engine_probe.py
   realProvider: two-pass-qualified
-  date: '2026-10-30'
-  expectedDocuments: 15
-  firstRunNew: 15
-  firstRunPdfReadback: 15
+  date: '2026-11-01'
+  expectedDocuments: 14
+  firstRunNew: 14
+  firstRunPdfReadback: 14
   repeatRunNew: 0
-  firstRunClicks: 15
-  firstRunDownloadEvents: 15
+  firstRunClicks: 14
+  firstRunDownloadEvents: 14
   repeatRunClicks: 0
   repeatRunDownloadEvents: 0
-  keySetsSha256: bb2f8fb4a760339080919e0ffeb80f55abe377db05486e76131157a79bca1043
+  keySetsSha256: 4ebf5d7235f9d3cc421bea5c5929bf8926e8fcf2534e480254da7f3558b965f8
   independentSessions: true
-  recipeSha256: 030609c8577d41fe0e2a45b1af696dc1cf61e0148772d8bc95969dd79537f4a5
+  recipeSha256: 14bddd891195b4718160346230786d71738b18ae73dd9e60124252eb2c6ef799
