@@ -23,7 +23,8 @@
       "enum": [
         "45e530b7d6240abb308810183dbe4f65aae5b6dc",
         "4d2a893be89a83c47b940c174bad3fa75bbf2ade",
-        "c87f980b985d526dac95760e477cec95f280896d"
+        "c87f980b985d526dac95760e477cec95f280896d",
+        "3be39481c93f41fbc3e4e109b52cd738ce0595b1"
       ]
     },
     "status": {
@@ -37,7 +38,8 @@
         "single-payment-schedule",
         "first-listed-document",
         "all-available-invoices",
-        "offered-operation-notices"
+        "offered-operation-notices",
+        "offered-operation-notices-and-monthly-statements"
       ]
     },
     "limitations": {

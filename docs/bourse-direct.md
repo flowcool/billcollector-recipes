@@ -1,4 +1,7 @@
-# Bourse Direct operation notices
+# Bourse Direct notices and monthly statements
+
+Monthly account statements use the same task and session as operation notices.
+Read the [statement controls and proof](bourse-direct-statements.md).
 
 Catalog owner: `infra-22l0n`; delivered history: `infra-5iqmw`; engine pacing: `infra-36zv1`.
 Install the catalog recipe at `/apps/recipes_playwright/recipe-pw__bourse_direct.yaml`
@@ -16,8 +19,9 @@ current month fails closed. The source revision tracker remains active for both
 modes; unchanged notices do not create new output, corrected originals do.
 
 The recipe remains `incremental: true`, max_months13, max_items100,
-timeout_ms7200000. Only operation notices for the selected account are covered.
-Annual statements and tax documents require a separate decision.
+timeout_ms7200000. Monthly statements use `collect_statements: true` and read
+every offered period in both modes. The item/deadline bounds cover both families.
+Annual, securities and tax statements remain outside the recipe.
 
 The engine uses generic Settings login_request_interval_seconds (default60,
 minimum60 for this adapter) and document_request_interval_seconds (default5).
@@ -43,8 +47,10 @@ Florent approved operation notices only on 2026-10-30, without a new portal
 connection for this P1. The structured intake lives in `metadata.yaml` under
 `scope`. The retained PEA proof covers five October 2026 notices, then zero new
 files, on an older artifact. The current recipe remains experimental. PEA-PME
-has synthetic coverage only. Statements, IFU and other families are unverified
-extensions: their presence, keys and history need a later inventory and decision.
+has synthetic coverage only. Monthly statements were approved on 2026-11-08.
+Their retained controls are qualified offline in the linked statement document;
+the pinned engine implements collection in the existing source transaction. IFU and other families still need inventory
+and a scope decision.
 The retained 2025-10 calendar boundary is an October 2026 observation. It is not
 a fresh measurement or proof of 13 live months.
 

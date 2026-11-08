@@ -14,7 +14,7 @@ provider activation and Paperless integration.
 | Mint Energie | Original PDF from the monthly contract ZIP | 1 new, then 0; multiple PDFs per month fail closed |
 | CC Genevois | All offered invoices by invoice number | 5 new, then 0 |
 | Octopus Energy | Invoice preparation only | Experimental: account has no issued invoices |
-| Bourse Direct | Operation notices; GetAll up to 13 offered months | Experimental: changed recipe has synthetic proof only |
+| Bourse Direct | Operation notices up to 13 months; all offered monthly account statements | Experimental: changed recipe has synthetic proof only |
 
 Read `playwright/<provider>/metadata.yaml` before use. Free, Mint Energie and
 CC Genevois retain qualification baseline `45e530b7d6240abb308810183dbe4f65aae5b6dc`.
@@ -38,12 +38,12 @@ uv venv .venv
 uv pip install --python .venv/bin/python -r requirements-dev.txt
 .venv/bin/python -m unittest discover -s tests -v
 PYTHON=.venv/bin/python ./scripts/export-playwright-recipes.sh . ./export/playwright \
-  --engine-revision c87f980b985d526dac95760e477cec95f280896d
+  --engine-revision 3be39481c93f41fbc3e4e109b52cd738ce0595b1
 ```
 
 Export contains six runtime recipes, their schema and an ownership manifest.
 It excludes catalog metadata. Schema SHA256:
-`1d3b111472c6fdfaab9860fe1ee28d6c255105c69de8281902eefcef631e70f2`.
+`cebc9c7c6fb09f5d171f322a0cce92dd33a66d519478437c02559b16ef222b07`.
 The exporter rejects mixed, unmanaged or symlink destinations and restores the
 previous set after a caught write failure. Prepare releases in a disposable
 directory. Infra installs the export under its operation plan.
