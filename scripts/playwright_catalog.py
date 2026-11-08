@@ -9,7 +9,7 @@ import tempfile
 import yaml
 from jsonschema import validate
 
-REVISION = "b787b665e784d85b3eac0851fed4d141982768dc"
+REVISION = "3be39481c93f41fbc3e4e109b52cd738ce0595b1"
 MANIFEST = ".billcollector-playwright.json"
 SCHEMA = "recipe-pw-schema.yaml"
 

@@ -38,7 +38,7 @@ uv venv .venv
 uv pip install --python .venv/bin/python -r requirements-dev.txt
 .venv/bin/python -m unittest discover -s tests -v
 PYTHON=.venv/bin/python ./scripts/export-playwright-recipes.sh . ./export/playwright \
-  --engine-revision b787b665e784d85b3eac0851fed4d141982768dc
+  --engine-revision 3be39481c93f41fbc3e4e109b52cd738ce0595b1
 ```
 
 Export contains six runtime recipes, their schema and an ownership manifest.
