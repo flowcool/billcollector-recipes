@@ -218,6 +218,16 @@ class PlaywrightCatalogTests(unittest.TestCase):
 
 
 class BourseDirectCatalogTests(unittest.TestCase):
+    def test_export_enables_monthly_statements_in_the_existing_notice_task(self):
+        files = module.catalog(ROOT)
+        recipe = yaml.safe_load(files['recipe-pw__bourse_direct.yaml'])
+        step = recipe['services'][0]['steps'][1]
+        self.assertIs(step['methods'][-1]['arguments'][0].get('collect_statements'), True)
+        self.assertEqual(step['notice_identity']['query_parameters'], ['nc', 'type', 'year', 'month', 'day'])
+        metadata = yaml.safe_load((ROOT / 'playwright/bourse_direct/metadata.yaml').read_text())
+        self.assertEqual(metadata['scope']['families']['statements']['status'], 'implemented')
+        self.assertEqual(metadata['engineRevision'], module.REVISION)
+
     def test_history_recipe_is_experimental_and_preserves_incremental_default(self):
         metadata = yaml.safe_load((ROOT / 'playwright/bourse_direct/metadata.yaml').read_text())
         self.assertEqual(metadata['status'], 'experimental')

@@ -1,6 +1,7 @@
 # Bourse Direct monthly account statements
 
-This is offline source qualification. It does not enable statement collection.
+The catalog enables monthly account statements with `collect_statements: true`.
+Qualification remains synthetic and offline.
 Retained observations establish the controls below. They do not prove the current
 live portal. Credentials, private captures and account documents stay outside Git.
 The engine capability request is tracked by `infra-gc1q3`; the collector owner is
@@ -55,7 +56,7 @@ reader grant as notices. Add no tag. The importer classifies statements by
 their content. Infra must verify the actual type and access on original-byte
 readback before accepting production delivery.
 
-## Exact-engine blockers
+## Historical engine blockers
 
 The catalog exports YAML and schema files. It does not export
 `bourse_direct_adapter.py`. Editing that reference file alone cannot change
@@ -72,13 +73,12 @@ native notice-only action:
 - The request guard rejects non-login POST requests. It therefore rejects the
   observed period form submission.
 
-The engine owner must extend this boundary before the catalog can enable
-statements. Keep one authenticated session, the existing task and delivery
+The statement-capable pin in catalog metadata extends this boundary. Keep one authenticated session, the existing task and delivery
 journal, request pacing, failure budget, and uncertain-delivery inhibition.
 Do not weaken the POST guard for unrelated routes. Run notice and statement
 collection under one source transaction without another login.
 
-Reproduce the compatibility result with the engine runtime dependencies:
+Reproduce the historical compatibility gap with the engine runtime dependencies:
 
 ```sh
 python tests/bourse_direct_statements_gate_probe.py /path/to/engine/repository
@@ -104,3 +104,35 @@ Real-provider proof and production deployment require Florent's GO. Infra's
 full-window guard currently accepts operation notices only and pins the old
 recipe hash. Infra must qualify its statement scope and pin changes before
 deployment. A merged catalog PR alone does not make that guard compatible.
+
+## Current candidate qualification
+
+Read `engineRevision` in provider metadata for the exact qualified pin. The
+exporter and vendored schema use that pin. Statement identity is supplied per
+original by the engine; the recipe keeps its existing notice identity policy.
+The request guard permits one exact native period-form POST at a time.
+
+Run the positive compatibility gate against the exact pin:
+
+```sh
+python tests/bourse_direct_statements_gate_probe.py /path/to/engine --candidate-revision <engineRevision>
+python tests/bourse_direct_engine_probe.py /path/to/exact/engine
+```
+
+The first command archives the selected commit, blocks sockets and checks the
+notice control, statement option, source identity and last-business-day target.
+It does not prove acquisition. The second command exports the catalog into an
+isolated directory. It runs a notice-only control with the statement flag removed,
+then runs the unchanged exported candidate through the exact engine on synthetic
+browser fixtures. Both modes cover full offered periods, new/late months,
+corrections, source refusal and uncertainty without resend. The engine's combined
+control also compares notice counts and original hashes before and after opt-in.
+Credentials/TOTP and consumers are synthetic. Vault transport, scheduling, live
+portal controls, Infra consume mounts and Paperless readback remain unqualified.
+
+Statements always read the complete offered list, including months older than
+the notice window. The engine refuses more than 120 unique statement periods.
+`max_items: 100` counts both families; `timeout_ms: 7200000` bounds the whole
+source transaction. Form submissions, statement HTML reads and original reads
+share the configured document gate. No second login or separate task is added.
+Infra must promote the exact packaged schema before enabling this recipe.

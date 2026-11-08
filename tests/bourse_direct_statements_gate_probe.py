@@ -1,7 +1,8 @@
-"""Prove the statement capability gap with untouched engine source, offline.
+"""Probe historical gaps or a statement-capable engine commit, offline.
 
 Run with the selected engine's Python runtime dependencies installed.
-This is a negative compatibility proof. It is not collection qualification.
+Default: historical negative proof. --candidate-revision: positive compatibility.
+Neither mode proves collection qualification.
 """
 
 import argparse
@@ -25,13 +26,14 @@ REVISIONS = (
 )
 
 
-def worker(area, revision):
+def worker(area, revision, candidate=False):
     sys.path.insert(0, str(area / "engine/apps"))
     from billcollector import bourse_direct, recipes
 
     recipe = ROOT / "playwright/bourse_direct/recipe-pw__bourse_direct.yaml"
     data = yaml.safe_load(recipe.read_text())
     options = data["services"][0]["steps"][1]["methods"][-1]["arguments"][0]
+    options.pop('collect_statements', None)  # Explicit unchanged-notice control.
     original_options = dict(options)
 
     def refused(*args, **kwargs):
@@ -47,6 +49,25 @@ def worker(area, revision):
 
         options["collect_statements"] = True
         ok, _, _ = recipes.validate_recipe(yaml.safe_dump(data))
+        if candidate:
+            if not ok:
+                raise RuntimeError('Statement candidate option is refused')
+            from billcollector.bourse_direct_statements import POLICY
+            from billcollector.notice import source_digest
+
+            target, day = bourse_direct._target(
+                bourse_direct.ORIGIN + '/priv/new/releves.php',
+                'releveCompte.php?nc=1&type=RE&dt=20251128&trash=/avis.pdf&pdf=1',
+                account='1', period=(2025, 11), pdf=True, family='statement')
+            if day.isoformat() != '2025-11-28' or len(source_digest(target, POLICY)) != 64:
+                raise RuntimeError('Statement offered date or source identity is invalid')
+            print(json.dumps({'engine_revision': revision,
+                              'recipe_sha256': hashlib.sha256(recipe.read_bytes()).hexdigest(),
+                              'proof': 'positive-compatibility', 'real_provider': False,
+                              'paperless': False, **results, 'statement_option_accepted': True,
+                              'statement_identity_accepted': True, 'statement_original_target_accepted': True},
+                             sort_keys=True))
+            return
         if ok:
             raise RuntimeError("Engine now accepts a statement option; requalify the gap")
         results["statement_option_rejected"] = True
@@ -85,17 +106,23 @@ def worker(area, revision):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("engine_repository", type=Path, nargs="?")
+    parser.add_argument('--candidate-revision', help='Check this exact statement-capable commit instead of historical gaps')
     parser.add_argument("--worker", type=Path, help=argparse.SUPPRESS)
-    parser.add_argument("--revision", choices=REVISIONS, help=argparse.SUPPRESS)
+    parser.add_argument("--revision", help=argparse.SUPPRESS)
     args = parser.parse_args()
     if args.worker:
         if not args.revision:
             parser.error("--worker requires --revision")
-        worker(args.worker, args.revision)
+        worker(args.worker, args.revision, candidate=args.candidate_revision is not None)
         return
     if args.engine_repository is None:
         parser.error("engine_repository is required")
-    for revision in REVISIONS:
+    revisions = REVISIONS
+    if args.candidate_revision:
+        revisions = (subprocess.check_output(
+            ['git', '-C', str(args.engine_repository), 'rev-parse', '--verify',
+             args.candidate_revision + '^{commit}'], text=True).strip(),)
+    for revision in revisions:
         with tempfile.TemporaryDirectory(prefix="bd-statements-gap-") as temporary:
             area = Path(temporary)
             engine = area / "engine"
@@ -118,10 +145,10 @@ def main():
                 "PLAYWRIGHT_BROWSERS_PATH": "browser",
             }.items():
                 env[key] = str(area / value)
-            subprocess.run(
-                [sys.executable, str(Path(__file__).resolve()), "--worker", str(area),
-                 "--revision", revision], env=env, cwd=engine, check=True,
-            )
+            command = [sys.executable, str(Path(__file__).resolve()), '--worker', str(area), '--revision', revision]
+            if args.candidate_revision:
+                command += ['--candidate-revision', revision]
+            subprocess.run(command, env=env, cwd=engine, check=True)
 
 
 if __name__ == "__main__":

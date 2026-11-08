@@ -1,17 +1,17 @@
 service: bourse_direct
 engine: playwright-daemon
-engineRevision: c87f980b985d526dac95760e477cec95f280896d
+engineRevision: b787b665e784d85b3eac0851fed4d141982768dc
 status: experimental
-coverage: offered-operation-notices
+coverage: offered-operation-notices-and-monthly-statements
 limitations:
 - Download All covers up to 13 offered calendar months, including the current month. Incremental preserves the task
   date_window_days (default 90); both retain revision checks.
 - An explicit date-from override wins. Calendar reset to the current month fails closed. No all-history replay is
   forced on incremental runs.
-- Only operation notices for one PEA account; PEA-PME has synthetic coverage only. Annual statements and tax documents
-  are outside this recipe.
-- Synthetic exact-engine qualification only for this changed recipe. Earlier real-source proof covered October 2026
-  on an older artifact, not 13 live months.
+- Operation notices and monthly account statements for one PEA account; PEA-PME has synthetic coverage only.
+  Annual statements, securities statements and tax documents are outside this recipe.
+- Synthetic exact-engine qualification only. Earlier real-source proof covered October 2026 notices
+  on an older artifact. No live monthly statement collection is claimed.
 - Requires the native Bourse Direct engine adapter and separately configured vault, delivery, login/document request
   gates. Deployment belongs to Infra.
 validation:
@@ -22,15 +22,15 @@ scope:
     operation_notices:
       status: implemented
       availability: observed
-      reason: Approved notice-only scope. Retained PEA provider proof; PEA-PME has synthetic coverage only.
+      reason: Approved notice scope. Retained PEA provider proof; PEA-PME has synthetic coverage only.
       extension: Qualify each additional account on the exact recipe and engine before enabling it.
     statements:
-      status: documented
+      status: implemented
       availability: observed
-      reason: Monthly account statements approved on 2026-11-08. Retained controls and 21 periods are qualified
-        offline in docs/bourse-direct-statements.md. Current live availability is unverified.
-      extension: Engine capability infra-gc1q3 must precede collection. Exact native engines reject statement options,
-        identity and PDF targets. Real-provider proof and deployment require Florent's GO.
+      reason: Monthly account statements approved on 2026-11-08. Read every offered period in the same task/session.
+        Identity uses nc,type,dt and the original content revision. Retained controls included 21 monthly periods.
+      extension: Infra must qualify the live selected-account label, offered inventory and Paperless readback
+        on the pinned engine, schema and exported recipe before production acceptance.
     tax_documents:
       status: documented
       availability: unverified
@@ -44,12 +44,14 @@ scope:
   history:
     maxMonths: 13
     observedOldestMonth: '2025-10'
-    incrementalWindow: Task date_window_days, default 90; explicit recovery start wins within recipe bounds.
+    incrementalWindow: Notices use task date_window_days, default 90; explicit recovery start wins. Statements always read the full offered list.
     controlRunRequired: true
   stableKey: [nc, type, year, month, day]
   limits:
   - GetAll includes the current month and at most 12 preceding offered months; incremental keeps its recent window.
   - max_items 100 and timeout_ms 7200000; calendar reset to current month fails closed.
+  - The 13-month bound and stableKey above apply to notices. Statements use nc,type,dt over every offered period;
+    max_items 100 bounds both families together. The engine refuses more than 120 statement periods.
   - Separate durable login and document gates; login minimum 60 seconds, document default 5 seconds.
   - Stop after the safe-login failure budget; no automatic retry after an uncertain login outcome.
   - Infra owns the periodic full-window control run and alerting; cadence is not set by this catalog.
@@ -57,5 +59,5 @@ scope:
   - Old PEA provider proof covered five October 2026 notices and zero new files on repeat, on an older artifact.
   - The 2025-10 history boundary is a retained October 2026 observation, not a new portal measurement.
   - Current recipe has synthetic exact-engine proof only; PEA-PME has no live qualification.
-  - Earlier notice-only scope had no fresh portal connection. Monthly statements were approved on 2026-11-08;
-    retained observations only, not implemented or live-qualified.
+  - Monthly statements were approved on 2026-11-08. Implementation has synthetic proof only;
+    retained observations do not prove current live availability or Paperless delivery.
