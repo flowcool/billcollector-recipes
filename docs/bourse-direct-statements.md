@@ -127,6 +127,18 @@ then runs the unchanged exported candidate through the exact engine on synthetic
 browser fixtures. Both modes cover full offered periods, new/late months,
 corrections, source refusal and uncertainty without resend. The engine's combined
 control also compares notice counts and original hashes before and after opt-in.
+Run the exported recipe on the exact immutable image with saved receipts:
+
+```sh
+python tests/bourse_direct_engine_probe.py /path/to/exact/engine \
+  --image ghcr.io/flowcool/billcollector-playwright@sha256:<digest> \
+  --proof-dir tmp/statement-image-proof
+```
+
+The image must already be pulled. The tool checks its revision label, uses
+network isolation and UID 1003, and retains the log and result in the new proof
+directory. The one-shot container uses `--rm`; its evidence lives in those files.
+
 Credentials/TOTP and consumers are synthetic. Vault transport, scheduling, live
 portal controls, Infra consume mounts and Paperless readback remain unqualified.
 

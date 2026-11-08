@@ -42,7 +42,7 @@ def worker(area, revision, candidate=False):
     results = {}
     with patch.object(socket.socket, "connect", refused), \
             patch.object(socket.socket, "connect_ex", refused):
-        ok, error, _ = recipes.validate_recipe(recipe.read_text())
+        ok, error, _ = recipes.validate_recipe(yaml.safe_dump(data))
         if not ok:
             raise RuntimeError("Notice recipe positive control failed: " + error)
         results["notice_recipe_accepted"] = True
