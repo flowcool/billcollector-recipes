@@ -26,9 +26,11 @@ scope:
       extension: Qualify each additional account on the exact recipe and engine before enabling it.
     statements:
       status: documented
-      availability: unverified
-      reason: Outside the approved scope; portal availability and history are not verified.
-      extension: Inventory the portal family, key and history under a separate provider scope decision.
+      availability: observed
+      reason: Monthly account statements approved on 2026-11-08. Retained controls and 21 periods are qualified
+        offline in docs/bourse-direct-statements.md. Current live availability is unverified.
+      extension: Engine capability infra-gc1q3 must precede collection. Exact native engines reject statement options,
+        identity and PDF targets. Real-provider proof and deployment require Florent's GO.
     tax_documents:
       status: documented
       availability: unverified
@@ -55,4 +57,5 @@ scope:
   - Old PEA provider proof covered five October 2026 notices and zero new files on repeat, on an older artifact.
   - The 2025-10 history boundary is a retained October 2026 observation, not a new portal measurement.
   - Current recipe has synthetic exact-engine proof only; PEA-PME has no live qualification.
-  - Operator approved operation notices only, with no fresh portal connection for this P1.
+  - Earlier notice-only scope had no fresh portal connection. Monthly statements were approved on 2026-11-08;
+    retained observations only, not implemented or live-qualified.

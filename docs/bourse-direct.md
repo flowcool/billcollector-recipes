@@ -46,8 +46,10 @@ Florent approved operation notices only on 2026-10-30, without a new portal
 connection for this P1. The structured intake lives in `metadata.yaml` under
 `scope`. The retained PEA proof covers five October 2026 notices, then zero new
 files, on an older artifact. The current recipe remains experimental. PEA-PME
-has synthetic coverage only. Statements, IFU and other families are unverified
-extensions: their presence, keys and history need a later inventory and decision.
+has synthetic coverage only. Monthly statements were approved on 2026-11-08.
+Their retained controls are qualified offline in the linked statement document;
+collection needs the engine extension. IFU and other families still need inventory
+and a scope decision.
 The retained 2025-10 calendar boundary is an October 2026 observation. It is not
 a fresh measurement or proof of 13 live months.
 
