@@ -1,5 +1,8 @@
 # Bourse Direct operation notices
 
+Monthly account statements have separate [offline qualification](bourse-direct-statements.md).
+The native engine needs an extension before this recipe can collect them.
+
 Catalog owner: `infra-22l0n`; delivered history: `infra-5iqmw`; engine pacing: `infra-36zv1`.
 Install the catalog recipe at `/apps/recipes_playwright/recipe-pw__bourse_direct.yaml`
 and use an explicit recipe_file for the existing task. Keep its service/user

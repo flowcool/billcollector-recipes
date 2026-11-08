@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="fr"><body>
+<form id="frmCompte" name="frmCompte" method="get">
+  <select id="nc" name="nc">
+    <option value="1" selected>Synthetic holder (Compte PEA)</option>
+    <option value="2">Synthetic holder (Compte PEA-PME)</option>
+  </select>
+</form>
+<form id="frmRlv" name="frmRlv" action="?" method="post">
+  <input type="hidden" name="nc" value="1">
+  <select name="RlvCombo" onchange="document.frmRlv.submit();">
+    <option value="1" selected>Décembre 2025</option>
+    <option value="2">Novembre 2025</option>
+    <option value="3">Octobre 2025</option>
+  </select>
+</form>
+<a href="javascript:ouvrePopup('releveCompte.php?nc=1&amp;dt=20251231&amp;type=RE','encours')">Relevé de compte</a>
+<a href="javascript:ouvrePopup('releveTitres.php?nc=1&amp;dt=20251231&amp;type=RT','encours')">Relevé de titres</a>
+</body></html>
